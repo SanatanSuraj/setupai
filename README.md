@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SetupAI – Diagnostic Lab & Clinic Setup Platform
 
-## Getting Started
+A production-ready multi-tenant SaaS platform for Indian diagnostic lab and clinic entrepreneurs. AI-powered roadmap, compliance tracking, equipment planning, and financial modeling.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 14** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **MongoDB** + **Mongoose**
+- **NextAuth** (JWT session strategy)
+- **bcrypt** (password hashing)
+- **Zustand** (state management)
+- **React Hook Form** + **Zod**
+- **Recharts** (analytics)
+- Role-Based Access Control (RBAC)
+
+## Setup
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB (local or remote)
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Environment variables
+
+Copy the example env and set values:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+- `MONGODB_URI` – MongoDB connection string (default: `mongodb://127.0.0.1:27017/setupai`)
+- `NEXTAUTH_SECRET` – Secret for JWT (use a long random string in production)
+- `NEXTAUTH_URL` – App URL (e.g. `http://localhost:3000`)
+
+### 3. Start MongoDB (local)
+
+```bash
+mongod
+```
+
+Or use a cloud instance and set `MONGODB_URI` accordingly.
+
+### 4. Seed the database (optional)
+
+```bash
+npm run seed
+```
+
+This creates:
+
+- 1 organization (City Diagnostics, Pro plan)
+- 1 admin user: **admin@setupai.in** / **admin123**
+- Sample roadmap, license, equipment, and QC logs
+
+### 5. Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page (redirects to `/dashboard` if logged in) |
+| `/pricing` | Pricing (Free / Pro / Enterprise) |
+| `/contact` | Contact / Book demo |
+| `/login` | Sign in |
+| `/register` | Create account |
+| `/dashboard` | Dashboard overview (protected) |
+| `/dashboard/roadmap` | Setup roadmap & onboarding |
+| `/dashboard/licensing` | Licensing & compliance (Pro) |
+| `/dashboard/equipment` | Equipment planner & CAPEX |
+| `/dashboard/staff` | Staff roles & benchmarks |
+| `/dashboard/qc` | QC logs & SOP (Pro) |
+| `/dashboard/finance` | Financial model & break-even (Pro) |
+| `/dashboard/operations` | Sample orders & TAT (Enterprise) |
 
-## Learn More
+## Subscription gating
 
-To learn more about Next.js, take a look at the following resources:
+- **Free**: Basic roadmap only.
+- **Pro**: Licensing, QC, Finance.
+- **Enterprise**: Operations (multi-location / franchise).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Middleware redirects to `/dashboard?upgrade=pro` or `?upgrade=enterprise` when a gated module is accessed on a lower plan.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture
 
-## Deploy on Vercel
+- **Multi-tenant**: Each user belongs to an **Organization**. All data is scoped by `organizationId`.
+- **Roles**: Admin, Compliance Manager, Lab Manager, Viewer (RBAC in `lib/rbac.ts`).
+- **AI placeholder**: `lib/ai.ts` – `generateRoadmap()`, `documentGapAnalysis()`, `estimateLicenseApprovalTime()`, `recommendEquipment()` return mocked structured data; replace with real AI/LLM later.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` – Start dev server
+- `npm run build` – Production build
+- `npm run start` – Start production server
+- `npm run lint` – Run ESLint
+- `npm run seed` – Seed MongoDB (drops existing collections)
+
+## License
+
+Proprietary.
+# setupai
