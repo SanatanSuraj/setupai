@@ -9,9 +9,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
 
-    if (path === "/" && token) {
-      return NextResponse.redirect(new URL(dashboardPath, req.url));
-    }
+    // Allow everyone (including logged-in users) to see the landing page at /
     if (path.startsWith(dashboardPath) && !token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
