@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import type { UserRole } from "@/types";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "setupai-dev-secret-change-in-production";
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || "setupai-dev-secret-min-32-chars-for-jwt-signing";
 
 export async function getSessionUser(req: NextRequest) {
   const token = await getToken({ req, secret: JWT_SECRET });

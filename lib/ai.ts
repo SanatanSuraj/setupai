@@ -47,7 +47,8 @@ export interface DocumentGapResult {
   score: number;
 }
 
-export async function documentGapAnalysis(licenseType: string, _documents: string[]): Promise<DocumentGapResult> {
+export async function documentGapAnalysis(licenseType: string, documents: string[]): Promise<DocumentGapResult> {
+  void documents; // reserved for future document list validation
   const templates: Record<string, string[]> = {
     "Clinical Establishment": ["Registration form", "Address proof", "Medical qualification", "Fire NOC"],
     "BMW": ["Authorization form", "Waste management plan", "Agreement with CBWTF"],
