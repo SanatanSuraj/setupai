@@ -12,13 +12,40 @@ export function Navbar() {
         <Link href="/" className="text-xl font-bold text-primary">
           SetupAI
         </Link>
+
         <div className="flex items-center gap-6">
-          <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            href="/pricing"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
             Pricing
           </Link>
-          <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground">
+
+          <Link
+            href="/contact"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
             Contact
           </Link>
+
+          {/* ✅ Always Visible */}
+          <a
+            href="https://www.mobilab.in/products"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Products
+          </a>
+          <a
+            href="https://www.mobilab.in/certifications-awards"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Certifications & Awards
+          </a>
+
           {status === "loading" ? (
             <span className="text-sm text-muted-foreground">...</span>
           ) : session ? (
@@ -30,9 +57,13 @@ export function Navbar() {
             </Link>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium text-foreground hover:underline">
+              <Link
+                href="/login"
+                className="text-sm font-medium text-foreground hover:underline"
+              >
                 Log in
               </Link>
+
               <Link
                 href="/register"
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
