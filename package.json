@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "bcrypt": "^6.0.0",
+    "lucide-react": "^0.460.0",
     "mongoose": "^9.2.1",
     "next": "14.2.35",
     "next-auth": "^4.24.13",

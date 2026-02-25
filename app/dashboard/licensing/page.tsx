@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Card } from "@/components/dashboard/Card";
+import { Badge } from "@/components/dashboard/Badge";
+import { FileCheck, Plus } from "lucide-react";
 
 interface License {
   _id: string;
@@ -38,73 +41,89 @@ export default function LicensingPage() {
     }
   };
 
-  const statusColor = (s: string) =>
-    s === "approved" ? "bg-accent/20 text-accent" : s === "applied" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground";
+  const statusVariant = (s: string) => (s === "approved" ? "success" : s === "applied" ? "info" : "slate");
 
-  if (loading) return <div className="p-6 md:p-8"><p className="text-muted-foreground">Loading…</p></div>;
+  if (loading) {
+    return (
+      <div className="p-6 md:p-8">
+        <p className="text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-bold text-foreground">Licensing & Compliance</h1>
-      <p className="mt-1 text-muted-foreground">State-based checklists, document uploads, and renewal reminders.</p>
-      <button
-        onClick={() => setShowForm(!showForm)}
-        className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-      >
-        {showForm ? "Cancel" : "+ Add license"}
-      </button>
-      {showForm && (
-        <div className="mt-4 max-w-md rounded-xl border border-border bg-card p-4">
-          <label className="block text-sm font-medium text-foreground">Type</label>
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
-          >
-            <option value="Clinical Establishment">Clinical Establishment</option>
-            <option value="BMW">BMW</option>
-            <option value="Fire NOC">Fire NOC</option>
-            <option value="Trade License">Trade License</option>
-            <option value="NABL">NABL</option>
-          </select>
-          <label className="mt-3 block text-sm font-medium text-foreground">State</label>
-          <input
-            type="text"
-            value={state}
-            onChange={(e) => setState(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
-          />
-          <button
-            onClick={addLicense}
-            className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            Add
-          </button>
+    <div className="space-y-6 p-6 md:p-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Licensing & Compliance</h1>
+          <p className="text-slate-500 text-xs md:text-sm font-medium">State-based checklists, document uploads, and renewal reminders.</p>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-blue-700"
+        >
+          <Plus size={18} /> {showForm ? "Cancel" : "Add license"}
+        </button>
+      </div>
+
+      {showForm && (
+        <Card title="Add license">
+          <div className="max-w-md space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground">Type</label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+              >
+                <option value="Clinical Establishment">Clinical Establishment</option>
+                <option value="BMW">BMW</option>
+                <option value="Fire NOC">Fire NOC</option>
+                <option value="Trade License">Trade License</option>
+                <option value="NABL">NABL</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground">State</label>
+              <input
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+              />
+            </div>
+            <button onClick={addLicense} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">
+              Add
+            </button>
+          </div>
+        </Card>
       )}
-      <div className="mt-8 space-y-4">
+
+      <Card title="License tracker" icon={FileCheck}>
         {licenses.length === 0 && !showForm && (
           <p className="text-muted-foreground">No licenses yet. Add one to track compliance.</p>
         )}
-        {licenses.map((lic) => (
-          <div
-            key={lic._id}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4"
-          >
-            <div>
-              <h3 className="font-semibold text-foreground">{lic.type}</h3>
-              <p className="text-sm text-muted-foreground">{lic.state}</p>
-              {lic.renewalDate && (
-                <p className="text-xs text-muted-foreground">Renewal: {new Date(lic.renewalDate).toLocaleDateString()}</p>
-              )}
+        <div className="space-y-4">
+          {licenses.map((lic) => (
+            <div
+              key={lic._id}
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 hover:bg-slate-50 transition-colors"
+            >
+              <div>
+                <h3 className="font-semibold text-slate-800">{lic.type}</h3>
+                <p className="text-sm text-slate-500">{lic.state}</p>
+                {lic.renewalDate && (
+                  <p className="text-xs text-slate-400">Renewal: {new Date(lic.renewalDate).toLocaleDateString()}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-slate-500">{lic.documents?.length ?? 0} documents</span>
+                <Badge variant={statusVariant(lic.status)}>{lic.status}</Badge>
+              </div>
             </div>
-            <span className={`rounded-full px-2 py-1 text-xs font-medium ${statusColor(lic.status)}`}>
-              {lic.status}
-            </span>
-            <span className="text-sm text-muted-foreground">{lic.documents?.length ?? 0} documents</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }

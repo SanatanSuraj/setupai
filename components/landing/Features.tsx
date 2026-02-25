@@ -1,3 +1,5 @@
+"use client";
+
 const features = [
   {
     title: "Guided Setup Roadmap",
@@ -33,27 +35,67 @@ const features = [
 
 export function Features() {
   return (
-    <section className="px-4 py-16 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="text-center text-3xl font-bold text-foreground md:text-4xl">
-          Everything you need to go live
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-          One platform for setup, compliance, equipment, QC, and finance.
-        </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-xl border border-border bg-card p-6 shadow-sm transition hover:border-primary/30 hover:shadow-md"
-            >
-              <span className="text-3xl">{f.icon}</span>
-              <h3 className="mt-4 font-semibold text-foreground">{f.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{f.description}</p>
-            </div>
-          ))}
+    <>
+      {/* Features Section */}
+      <section className="px-4 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-bold text-foreground md:text-4xl">
+            Everything you need to go live
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
+            One platform for setup, compliance, equipment, QC, and finance.
+          </p>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="rounded-xl border border-border bg-card p-6 shadow-sm transition hover:border-primary/30 hover:shadow-md"
+              >
+                <span className="text-3xl">{f.icon}</span>
+                <h3 className="mt-4 font-semibold text-foreground">{f.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {f.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Certifications Section */}
+      <section className="bg-gradient-to-b from-green-50 to-white py-20 text-black">
+        <div className="mx-auto max-w-6xl px-4 text-center">
+          <h2 className="text-lg font-semibold tracking-widest text-green-500">
+            CERTIFIED & LICENSED
+          </h2>
+
+          <div className="mt-16 grid gap-12 md:grid-cols-3">
+            <div>
+              <h3 className="text-5xl font-bold">ISO</h3>
+              <p className="mt-4 text-lg text-gray-400">
+                13485 & 9001
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-5xl font-bold">IEC</h3>
+              <p className="mt-4 text-lg text-gray-400">
+                ESD - IEC 61000-4-2:2008
+                <br />
+                ESD - IEC 61000-4-8:2009
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-5xl font-bold">CDSCO</h3>
+              <p className="mt-4 text-lg text-gray-400">
+                MFG/IVD/KMP/22935
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
