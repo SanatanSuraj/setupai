@@ -7,13 +7,13 @@ import { signOut } from "next-auth/react";
 const nav = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/roadmap", label: "Setup Roadmap" },
-  { href: "/dashboard/licensing", label: "Licensing", pro: true },
+  { href: "/dashboard/licensing", label: "Licensing" },
   { href: "/dashboard/equipment", label: "Equipment" },
   { href: "/dashboard/guide", label: "Setup Guide" },
   { href: "/dashboard/staff", label: "Staffing & HR" },
-  { href: "/dashboard/qc", label: "QC & SOP", pro: true },
-  { href: "/dashboard/finance", label: "Financials", pro: true },
-  { href: "/dashboard/operations", label: "Operations", enterprise: true },
+  { href: "/dashboard/qc", label: "QC & SOP" },
+  { href: "/dashboard/finance", label: "Financials" },
+  { href: "/dashboard/operations", label: "Operations" },
 ];
 
 export function Sidebar() {

@@ -5,19 +5,16 @@ const plans = [
     name: "Free",
     price: "₹0",
     period: "forever",
-    description: "Get started with basic roadmap and limited compliance guidance.",
-    features: ["Basic roadmap", "Limited compliance guidance", "1 user"],
+    description: "Full access to all features. No credit card required.",
+    features: [
+      "Full setup roadmap",
+      "Licensing & Compliance",
+      "QC dashboard",
+      "Financial modeling",
+      "SOP builder",
+      "Unlimited users",
+    ],
     cta: "Get Started",
-    href: "/register",
-    highlighted: false,
-  },
-  {
-    name: "Pro",
-    price: "₹999",
-    period: "/month",
-    description: "Full licensing, QC dashboard, financial modeling, and SOP builder.",
-    features: ["Everything in Free", "Full licensing module", "QC dashboard", "Financial modeling", "SOP builder", "Up to 5 users"],
-    cta: "Start free trial",
     href: "/register",
     highlighted: true,
   },
@@ -26,7 +23,7 @@ const plans = [
     price: "Custom",
     period: "",
     description: "Multi-location management, franchise tracking, dedicated support.",
-    features: ["Everything in Pro", "Multi-location dashboard", "Franchise tracking", "Dedicated compliance manager", "Unlimited users"],
+    features: ["Everything in Free", "Multi-location dashboard", "Franchise tracking", "Dedicated compliance manager", "On-site training"],
     cta: "Contact sales",
     href: "/contact",
     highlighted: false,
@@ -41,9 +38,9 @@ export function PricingSection() {
           Simple pricing
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
-          Start free. Upgrade when you need more.
+          Completely free for single labs during our beta period.
         </p>
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -55,7 +52,7 @@ export function PricingSection() {
             >
               {plan.highlighted && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-0.5 text-xs font-medium text-accent-foreground">
-                  Recommended
+                  Free Beta Access
                 </span>
               )}
               <h3 className="font-semibold text-foreground">{plan.name}</h3>

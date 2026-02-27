@@ -15,15 +15,6 @@ export default withAuth(
     }
 
     const tier = (token?.subscriptionTier as string) ?? "free";
-    const proModules = ["/dashboard/licensing", "/dashboard/qc", "/dashboard/finance"];
-    const enterpriseModules = ["/dashboard/operations"]; // multi-location / franchise could live here
-
-    if (proModules.some((m) => path.startsWith(m)) && tier === "free") {
-      return NextResponse.redirect(new URL("/dashboard?upgrade=pro", req.url));
-    }
-    if (enterpriseModules.some((m) => path.startsWith(m)) && tier !== "enterprise") {
-      return NextResponse.redirect(new URL("/dashboard?upgrade=enterprise", req.url));
-    }
 
     return NextResponse.next();
   },

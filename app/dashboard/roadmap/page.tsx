@@ -68,6 +68,8 @@ export default function RoadmapPage() {
   const [loading, setLoading] = useState(true);
   const [onboarding, setOnboarding] = useState(false);
   const [labType, setLabType] = useState("basic");
+  const [state, setState] = useState("Maharashtra");
+  const [district, setDistrict] = useState("Mumbai Suburban");
   const [city, setCity] = useState("Mumbai");
   const [budget, setBudget] = useState("1000000");
 
@@ -106,6 +108,8 @@ export default function RoadmapPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         labType,
+        state,
+        district,
         city,
         budget: parseInt(budget, 10) || undefined,
       }),
@@ -157,7 +161,7 @@ export default function RoadmapPage() {
         <p className="mt-1 text-muted-foreground">Generate your personalized setup roadmap.</p>
         <div className="mt-8 max-w-md rounded-xl border border-border bg-card p-6">
           <h2 className="font-semibold text-foreground">Onboarding</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Select lab type, city, and budget to generate your roadmap.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Select lab type, location, and budget to generate your roadmap.</p>
           <div className="mt-4 space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground">Lab type</label>
@@ -171,6 +175,26 @@ export default function RoadmapPage() {
                 <option value="advanced">Advanced</option>
                 <option value="clinic_lab">Clinic + Lab</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground">State</label>
+              <input
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+                placeholder="Maharashtra"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground">District</label>
+              <input
+                type="text"
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
+                placeholder="Mumbai Suburban"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground">City</label>
@@ -217,20 +241,26 @@ export default function RoadmapPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card title="Timeline Progress" className="md:col-span-2">
-          <div className="flex items-end justify-between mb-4">
-            <div>
-              <p className="text-3xl font-black text-slate-900">
-                Day {Math.round((progress / 100) * 120)} <span className="text-slate-400 text-sm font-normal">/ 120</span>
-              </p>
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Estimated Launch: July 2026</p>
+        <div className="md:col-span-2 space-y-6">
+          <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Selected Location</p>
+            <p className="text-lg font-bold text-slate-800">{city}, {district}, {state}</p>
+          </div>
+          <Card title="Timeline Progress">
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="text-3xl font-black text-slate-900">
+                  Day {Math.round((progress / 100) * 120)} <span className="text-slate-400 text-sm font-normal">/ 120</span>
+                </p>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Estimated Launch: July 2026</p>
+              </div>
+              <Badge variant="success">On Track</Badge>
             </div>
-            <Badge variant="success">On Track</Badge>
-          </div>
-          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-            <div className="bg-blue-600 h-full transition-all duration-1000" style={{ width: `${progress}%` }} />
-          </div>
-        </Card>
+            <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+              <div className="bg-blue-600 h-full transition-all duration-1000" style={{ width: `${progress}%` }} />
+            </div>
+          </Card>
+        </div>
         <Card title="Quick Stats">
           <div className="space-y-3">
             <div className="flex justify-between text-sm">
