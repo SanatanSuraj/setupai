@@ -12,15 +12,17 @@ const nav = [
   { href: "/dashboard/guide", label: "Setup Guide" },
   { href: "/dashboard/staff", label: "Staffing & HR" },
   { href: "/dashboard/qc", label: "QC & SOP" },
+  { href: "/dashboard/nabl", label: "NABL Accreditation" },
   { href: "/dashboard/finance", label: "Financials" },
   { href: "/dashboard/operations", label: "Operations" },
+  { href: "/dashboard/analytics", label: "Analytics" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 flex-col border-r border-border bg-card">
+    <aside className="sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-border bg-card">
       <div className="flex h-16 items-center border-b border-border px-4">
         <Link href="/dashboard" className="font-bold text-primary">
           SetupAI

@@ -17,12 +17,13 @@ export async function POST(req: Request) {
   if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
-    const { type, state, status } = body;
+    const { type, state, district, status } = body;
     await connectDB();
     const license = await License.create({
       organizationId: session.user.organizationId,
       type: type ?? "Clinical Establishment",
       state: state ?? "Maharashtra",
+      district: district ?? "General",
       status: status ?? "pending",
       documents: [],
     });

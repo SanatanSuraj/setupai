@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth-options";
 import { Card } from "@/components/dashboard/Card";
-import { Badge } from "@/components/dashboard/Badge";
 import { ActiveTasks } from "@/components/dashboard/ActiveTasks";
 import { SetupProgress } from "@/components/dashboard/SetupProgress";
 import {
@@ -11,6 +10,7 @@ import {
   ShieldCheck,
   BarChart3,
   Layers,
+  FileCheck,
 } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -103,18 +103,23 @@ export default async function DashboardPage() {
 
       <div className="mt-6 flex flex-wrap gap-4">
         <Link
+          href="/dashboard/licensing"
+          className="rounded-xl border-2 border-blue-200 bg-blue-50/50 p-6 shadow-sm hover:border-blue-300 hover:bg-blue-50 flex-1 min-w-[200px] group"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2.5 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-200 transition-colors">
+              <FileCheck size={22} />
+            </div>
+            <h2 className="font-bold text-slate-900">Licenses</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-600">Browse, apply, and track all required licenses and compliance documents.</p>
+        </Link>
+        <Link
           href="/dashboard/roadmap"
           className="rounded-xl border border-border bg-card p-6 shadow-sm hover:border-primary/30 flex-1 min-w-[140px]"
         >
           <h2 className="font-semibold text-foreground">Roadmap</h2>
           <p className="mt-1 text-sm text-muted-foreground">Setup timeline and tasks</p>
-        </Link>
-        <Link
-          href="/dashboard/licensing"
-          className="rounded-xl border border-border bg-card p-6 shadow-sm hover:border-primary/30 flex-1 min-w-[140px]"
-        >
-          <h2 className="font-semibold text-foreground">Licensing</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Compliance and documents</p>
         </Link>
         <Link
           href="/dashboard/equipment"

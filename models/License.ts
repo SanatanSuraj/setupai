@@ -1,21 +1,39 @@
-import mongoose, { Schema, Model } from "mongoose";
-import type { ILicense, LicenseStatus } from "@/types";
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
-const LicenseSchema = new Schema<ILicense>(
-  {
-    organizationId: { type: Schema.Types.ObjectId, ref: "Organization", required: true },
-    type: { type: String, required: true },
-    state: { type: String, required: true },
-    status: { type: String, enum: ["pending", "applied", "approved", "rejected"] as LicenseStatus[], default: "pending" },
-    renewalDate: { type: Date },
-    documents: [{
-      name: String,
-      url: String,
-      uploadedAt: { type: Date, default: Date.now },
-    }],
-    createdAt: { type: Date, default: Date.now },
+export interface ILicense {
+  organizationId: mongoose.Types.ObjectId;
+  type: string; // e.g., 'BMW', 'CEA', 'Fire NOC', 'Trade License'
+  state: string;
+  district: string;
+  status: 'pending' | 'submitted' | 'approved' | 'rejected' | 'expired';
+  documents: string[]; // S3/Cloudinary URLs
+  expiryDate?: Date;
+  approvalDate?: Date;
+  notes?: string;
+  isHardGate: boolean; // true for BMW, CEA, etc.
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface LicenseDocument extends ILicense, Document {}
+
+const LicenseSchema = new Schema<LicenseDocument>({
+  organizationId: { type: Schema.Types.ObjectId, ref: 'Organization', required: true, index: true },
+  type: { type: String, required: true, index: true },
+  state: { type: String, required: true },
+  district: { type: String, required: true },
+  status: { 
+    type: String, 
+    enum: ['pending', 'submitted', 'approved', 'rejected', 'expired'], 
+    default: 'pending',
+    index: true 
   },
-  { timestamps: true }
-);
+  documents: [String],
+  expiryDate: Date,
+  approvalDate: Date,
+  notes: String,
+  isHardGate: { type: Boolean, default: false },
+}, { timestamps: true });
 
-export const License: Model<ILicense> = mongoose.models.License ?? mongoose.model<ILicense>("License", LicenseSchema);
+export const License: Model<LicenseDocument> = mongoose.models.License || mongoose.model<LicenseDocument>('License', LicenseSchema);
+
