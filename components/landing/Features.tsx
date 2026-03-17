@@ -63,39 +63,7 @@ export function Features() {
         </div>
       </section>
 
-      {/* Certifications Section */}
-      <section className="bg-gradient-to-b from-green-50 to-white py-20 text-black">
-        <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 className="text-lg font-semibold tracking-widest text-green-500">
-            CERTIFIED & LICENSED
-          </h2>
-
-          <div className="mt-16 grid gap-12 md:grid-cols-3">
-            <div>
-              <h3 className="text-5xl font-bold">ISO</h3>
-              <p className="mt-4 text-lg text-gray-400">
-                13485 & 9001
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-5xl font-bold">IEC</h3>
-              <p className="mt-4 text-lg text-gray-400">
-                ESD - IEC 61000-4-2:2008
-                <br />
-                ESD - IEC 61000-4-8:2009
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-5xl font-bold">CDSCO</h3>
-              <p className="mt-4 text-lg text-gray-400">
-                MFG/IVD/KMP/22935
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
     </>
   );
 }
