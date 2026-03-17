@@ -42,12 +42,12 @@ export async function GET(request: NextRequest) {
     else if (readinessScore < 95) phase = 'assessment';
     else phase = 'accredited';
 
-    // Quality manual sections
+    // Quality manual sections — all start as pending until the lab owner updates them
     const qualityManualSections = [
-      { name: 'Quality Policy & Objectives', status: 'completed', lastUpdated: '2024-01-15' },
-      { name: 'Document Control', status: 'completed', lastUpdated: '2024-01-10' },
-      { name: 'Management Responsibility', status: 'in_progress' },
-      { name: 'Resource Management', status: 'in_progress' },
+      { name: 'Quality Policy & Objectives', status: 'pending' },
+      { name: 'Document Control', status: 'pending' },
+      { name: 'Management Responsibility', status: 'pending' },
+      { name: 'Resource Management', status: 'pending' },
       { name: 'Pre-examination Processes', status: 'pending' },
       { name: 'Examination Processes', status: 'pending' },
       { name: 'Post-examination Processes', status: 'pending' },
@@ -57,68 +57,26 @@ export async function GET(request: NextRequest) {
     const completedSections = qualityManualSections.filter(s => s.status === 'completed').length;
     const overallCompletion = (completedSections / qualityManualSections.length) * 100;
 
-    // Proficiency testing status
-    const proficiencyTests = [
-      {
-        testName: 'Clinical Chemistry PT',
-        provider: 'CMC Vellore',
-        dueDate: '2024-03-15',
-        status: 'enrolled',
-        score: 95
-      },
-      {
-        testName: 'Hematology EQAS',
-        provider: 'AIIMS Delhi',
-        dueDate: '2024-02-28',
-        status: 'completed',
-        score: 92
-      },
-      {
-        testName: 'Microbiology PT',
-        provider: 'PGIMER Chandigarh',
-        dueDate: '2024-04-10',
-        status: 'pending'
-      }
-    ];
+    // Proficiency tests, audits start empty — lab owner adds them
+    const proficiencyTests: unknown[] = [];
+    const auditSchedule: unknown[] = [];
 
-    // Internal audit schedule
-    const auditSchedule = [
-      {
-        type: 'Internal Audit - Pre-examination',
-        date: '2024-02-20',
-        auditor: 'Quality Manager',
-        status: 'scheduled'
-      },
-      {
-        type: 'Internal Audit - Examination',
-        date: '2024-03-05',
-        auditor: 'Technical Manager',
-        status: 'pending'
-      },
-      {
-        type: 'Management Review',
-        date: '2024-03-20',
-        auditor: 'Laboratory Director',
-        status: 'pending'
-      }
-    ];
-
-    // Document control status
+    // Document control starts at zero
     const documentControl = {
-      totalDocuments: 45,
-      controlledDocuments: 38,
-      pendingReview: 7,
-      overdueDocs: 2
+      totalDocuments: 0,
+      controlledDocuments: 0,
+      pendingReview: 0,
+      overdueDocs: 0
     };
 
-    // NABL requirements checklist
+    // NABL requirements — all start at 0 completed
     const nablRequirements = [
-      { category: 'General Requirements', completed: 8, total: 10 },
-      { category: 'Structural Requirements', completed: 6, total: 8 },
-      { category: 'Resource Requirements', completed: 12, total: 15 },
-      { category: 'Process Requirements', completed: 18, total: 25 },
-      { category: 'Management System', completed: 9, total: 12 },
-      { category: 'Improvement Requirements', completed: 3, total: 6 }
+      { category: 'General Requirements', completed: 0, total: 10 },
+      { category: 'Structural Requirements', completed: 0, total: 8 },
+      { category: 'Resource Requirements', completed: 0, total: 15 },
+      { category: 'Process Requirements', completed: 0, total: 25 },
+      { category: 'Management System', completed: 0, total: 12 },
+      { category: 'Improvement Requirements', completed: 0, total: 6 }
     ];
 
     // Calculate estimated accreditation date
