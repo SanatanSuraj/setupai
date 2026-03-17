@@ -198,14 +198,54 @@ export default function RoadmapPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground">State</label>
-              <input
-                type="text"
+              <label className="block text-sm font-medium text-foreground">State / UT</label>
+              <select
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2"
-                placeholder="Maharashtra"
-              />
+              >
+                <option value="">— Select State / UT —</option>
+                <optgroup label="States">
+                  <option>Andhra Pradesh</option>
+                  <option>Arunachal Pradesh</option>
+                  <option>Assam</option>
+                  <option>Bihar</option>
+                  <option>Chhattisgarh</option>
+                  <option>Goa</option>
+                  <option>Gujarat</option>
+                  <option>Haryana</option>
+                  <option>Himachal Pradesh</option>
+                  <option>Jharkhand</option>
+                  <option>Karnataka</option>
+                  <option>Kerala</option>
+                  <option>Madhya Pradesh</option>
+                  <option>Maharashtra</option>
+                  <option>Manipur</option>
+                  <option>Meghalaya</option>
+                  <option>Mizoram</option>
+                  <option>Nagaland</option>
+                  <option>Odisha</option>
+                  <option>Punjab</option>
+                  <option>Rajasthan</option>
+                  <option>Sikkim</option>
+                  <option>Tamil Nadu</option>
+                  <option>Telangana</option>
+                  <option>Tripura</option>
+                  <option>Uttar Pradesh</option>
+                  <option>Uttarakhand</option>
+                  <option>West Bengal</option>
+                </optgroup>
+                <optgroup label="Union Territories">
+                  <option>Andaman and Nicobar Islands</option>
+                  <option>Chandigarh</option>
+                  <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                  <option>Delhi (NCT)</option>
+                  <option>Jammu and Kashmir</option>
+                  <option>Ladakh</option>
+                  <option>Lakshadweep</option>
+                  <option>Puducherry</option>
+                </optgroup>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground">District</label>

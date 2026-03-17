@@ -6,10 +6,10 @@ import { signOut } from "next-auth/react";
 
 const nav = [
   { href: "/dashboard", label: "Overview" },
-  { href: "/dashboard/roadmap", label: "Setup Roadmap" },
+  { href: "/dashboard/guide", label: "Setup Guide" },
+  { href: "/dashboard/roadmap", label: "Roadmap" },
   { href: "/dashboard/licensing", label: "Licensing" },
   { href: "/dashboard/equipment", label: "Equipment" },
-  { href: "/dashboard/guide", label: "Setup Guide" },
   { href: "/dashboard/staff", label: "Staffing & HR" },
   { href: "/dashboard/nabl", label: "NABL Accreditation" },
   { href: "/dashboard/operations", label: "Operations" },
