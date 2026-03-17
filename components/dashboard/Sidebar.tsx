@@ -11,11 +11,9 @@ const nav = [
   { href: "/dashboard/equipment", label: "Equipment" },
   { href: "/dashboard/guide", label: "Setup Guide" },
   { href: "/dashboard/staff", label: "Staffing & HR" },
-  { href: "/dashboard/qc", label: "QC & SOP" },
   { href: "/dashboard/nabl", label: "NABL Accreditation" },
-  { href: "/dashboard/finance", label: "Financials" },
   { href: "/dashboard/operations", label: "Operations" },
-  { href: "/dashboard/analytics", label: "Analytics" },
+
 ];
 
 export function Sidebar() {
@@ -40,8 +38,6 @@ export function Sidebar() {
               }`}
             >
               {item.label}
-              {item.pro && <span className="ml-1 text-xs">Pro</span>}
-              {item.enterprise && <span className="ml-1 text-xs">Ent</span>}
             </Link>
           );
         })}

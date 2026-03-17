@@ -482,8 +482,7 @@ export default function NABLPage() {
           <p className="text-slate-500 text-xs md:text-sm font-medium">ISO 15189:2022 Medical Laboratories — all sections editable by lab owner</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700">Generate Application</button>
-          <button className="px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50">Schedule Assessment</button>
+
         </div>
       </div>
 

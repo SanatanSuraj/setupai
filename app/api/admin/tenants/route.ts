@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       },
       features: {
         enabledModules: features?.enabledModules || [
-          'dashboard', 'roadmap', 'licensing', 'equipment', 'staff', 'qc', 'finance', 'operations'
+          'dashboard', 'roadmap', 'licensing', 'equipment', 'staff', 'qc', 'operations'
         ],
         customModuleNames: features?.customModuleNames || {},
         hiddenFeatures: features?.hiddenFeatures || [],

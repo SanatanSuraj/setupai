@@ -8,7 +8,6 @@ import {
   Clock, 
   TrendingUp, 
   AlertTriangle, 
-  CheckCircle, 
   Users,
   BarChart3,
   Calendar,
@@ -34,15 +33,6 @@ interface OperationsMetrics {
     tatCompliance: number;
     rejectionRate: number;
     avgTAT: number;
-  };
-  qualityMetrics: {
-    iqcCompliance: number;
-    eqasPerformance: number;
-    calibrationStatus: Array<{
-      equipment: string;
-      status: 'current' | 'due' | 'overdue';
-      nextDue: string;
-    }>;
   };
   bmwTracking: {
     monthlyGeneration: number;
@@ -79,12 +69,12 @@ export default function OperationsPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/operations/orders").then(r => r.json()),
-      fetch("/api/operations/metrics").then(r => r.json())
+      fetch("/api/operations/orders").then(r => r.ok ? r.json() : []),
+      fetch("/api/operations/metrics").then(r => r.ok ? r.json() : null)
     ])
     .then(([ordersData, metricsData]) => {
-      setOrders(ordersData);
-      setMetrics(metricsData);
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
+      setMetrics(metricsData?.sampleTracking ? metricsData : null);
     })
     .finally(() => setLoading(false));
   }, []);
@@ -236,42 +226,6 @@ export default function OperationsPage() {
             </div>
           </Card>
 
-          {/* Quality Metrics */}
-          <Card
-            title="Quality Control Status"
-            icon={CheckCircle}
-          >
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-xl font-bold text-green-800">{metrics.qualityMetrics.iqcCompliance}%</div>
-                  <div className="text-xs text-green-600">IQC Compliance</div>
-                </div>
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-xl font-bold text-blue-800">{metrics.qualityMetrics.eqasPerformance}%</div>
-                  <div className="text-xs text-blue-600">EQAS Score</div>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-slate-800">Equipment Calibration</h4>
-                {metrics.qualityMetrics.calibrationStatus.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                    <span className="text-sm text-slate-700">{item.equipment}</span>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={
-                        item.status === 'current' ? 'success' :
-                        item.status === 'due' ? 'warning' : 'danger'
-                      }>
-                        {item.status}
-                      </Badge>
-                      <span className="text-xs text-slate-500">{item.nextDue}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
         </div>
       )}
 

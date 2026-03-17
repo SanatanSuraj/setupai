@@ -124,10 +124,6 @@ export default function LandingPage() {
                         <div className="absolute bottom-24 right-8 bg-white px-4 py-2 rounded-lg shadow-lg border border-red-100 text-sm font-bold text-red-600 rotate-[-15deg] animate-float-slow">
                             BMW License Rejected
                         </div>
-                        <div className="absolute top-1/2 left-16 bg-white px-3 py-1 rounded-md shadow border border-slate-200 text-xs font-semibold text-slate-500 rotate-[-20deg]">
-                            SOPs?
-                        </div>
-
                         {/* Confused Avatar */}
                         <div className="relative z-10 mt-4">
                             <div className="w-32 h-32 bg-slate-200 rounded-full flex items-center justify-center shadow-inner border-4 border-white">
@@ -256,30 +252,15 @@ export default function LandingPage() {
 
                         {/* Step 4 */}
                         <div className="flex flex-col md:flex-row items-center justify-between w-full group">
-                            <div className="md:w-5/12 w-full hidden md:block"></div>
-                            {/* Desktop Node */}
-                            <div className="hidden md:flex w-2/12 justify-center relative">
-                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-purple-500 flex items-center justify-center z-10 text-xl font-black text-purple-400">4</div>
-                            </div>
-                            <div className="md:w-5/12 text-left md:pl-8 mb-6 md:mb-0 w-full pl-12 md:pl-0 relative">
-                                 {/* Mobile Node */}
-                                 <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-purple-500 flex items-center justify-center font-bold text-purple-400 text-sm">4</div>
-                                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition">Quality Control & SOPs</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed">Access pre-built Standard Operating Procedure (SOP) templates. Set up your internal QC values and prepare for NABL audits from day one.</p>
-                            </div>
-                        </div>
-
-                        {/* Step 5 */}
-                        <div className="flex flex-col md:flex-row items-center justify-between w-full group">
                             <div className="md:w-5/12 text-left md:text-right md:pr-8 mb-6 md:mb-0 w-full pl-12 md:pl-0 relative">
                                 {/* Mobile Node */}
-                                <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-pink-500 flex items-center justify-center font-bold text-pink-400 text-sm">5</div>
+                                <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-pink-500 flex items-center justify-center font-bold text-pink-400 text-sm">4</div>
                                 <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-pink-400 transition">Launch & Operations</h3>
                                 <p className="text-slate-400 text-sm leading-relaxed">Hire Pathologists and Technicians using our salary benchmarks. Integrate your LIS/Billing software, run trial samples, and open your doors to patients.</p>
                             </div>
                             {/* Desktop Node */}
                             <div className="hidden md:flex w-2/12 justify-center relative">
-                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-pink-500 flex items-center justify-center z-10 text-xl font-black text-pink-400">5</div>
+                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-pink-500 flex items-center justify-center z-10 text-xl font-black text-pink-400">4</div>
                             </div>
                             <div className="md:w-5/12 w-full hidden md:block"></div>
                         </div>
@@ -301,7 +282,7 @@ export default function LandingPage() {
                 <div className="text-center mb-16">
                     <span className="text-blue-600 font-bold tracking-widest text-sm uppercase mb-2 block">Core Features</span>
                     <h2 className="text-3xl lg:text-5xl font-bold mb-4">Everything you need to go live.</h2>
-                    <p className="text-slate-600 text-lg max-w-2xl mx-auto">One platform for setup, compliance, equipment planning, and finance.</p>
+                    <p className="text-slate-600 text-lg max-w-2xl mx-auto">One platform for setup, compliance, equipment planning, and operations.</p>
                 </div>
                 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch mb-24">
@@ -351,22 +332,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
 
-                    {/* 4. Quality Control */}
-                    <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
-                        <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
-                            <i className="fas fa-clipboard-check text-2xl text-amber-600"></i>
-                        </div>
-                        <h5 className="text-amber-600 font-bold mb-3 uppercase tracking-wider text-xs">Quality Control</h5>
-                        <h2 className="text-2xl font-bold mb-4">Pass NABL audits.</h2>
-                        <p className="text-slate-600 mb-6 text-sm leading-relaxed">Get ready-to-use Standard Operating Procedure (SOP) templates. Log your daily QC values and get alerts before an audit failure happens.</p>
-                        <ul className="space-y-3 text-slate-700 font-medium text-sm mt-auto">
-                            <li><i className="fas fa-check-circle text-amber-500 mr-2"></i> Pre-built SOP templates</li>
-                            <li><i className="fas fa-check-circle text-amber-500 mr-2"></i> Daily QC value tracking</li>
-                            <li><i className="fas fa-check-circle text-amber-500 mr-2"></i> Audit prep checklist</li>
-                        </ul>
-                    </div>
-
-                    {/* 5. Staffing & HR */}
+                    {/* 4. Staffing & HR */}
                     <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
                         <div className="w-14 h-14 bg-pink-50 rounded-xl flex items-center justify-center mb-6">
                             <i className="fas fa-user-nurse text-2xl text-pink-600"></i>

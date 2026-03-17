@@ -16,8 +16,6 @@ export const MODULE_ROLES: Record<string, UserRole> = {
   licensing: "compliance_manager",
   equipment: "lab_manager",
   staff: "lab_manager",
-  qc: "lab_manager",
-  finance: "lab_manager",
   operations: "lab_manager",
 };
 

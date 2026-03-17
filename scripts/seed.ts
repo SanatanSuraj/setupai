@@ -79,19 +79,6 @@ async function seed() {
       createdAt: { type: Date, default: Date.now },
     })
   );
-  const QCLog = mongoose.connection.model(
-    "QCLog",
-    new mongoose.Schema({
-      organizationId: mongoose.Schema.Types.ObjectId,
-      testName: String,
-      value: Number,
-      controlRange: { min: Number, max: Number },
-      status: String,
-      correctiveAction: String,
-      createdAt: { type: Date, default: Date.now },
-    })
-  );
-
   const org = await Organization.create({
     name: "City Diagnostics",
     labType: "medium",
@@ -143,22 +130,6 @@ async function seed() {
     capex: 450000,
     maintenanceCost: 5000,
     vendorId: vendor._id,
-  });
-
-  await QCLog.create({
-    organizationId: org._id,
-    testName: "Hb",
-    value: 14.2,
-    controlRange: { min: 12, max: 16 },
-    status: "in_range",
-  });
-  await QCLog.create({
-    organizationId: org._id,
-    testName: "Hb",
-    value: 11.1,
-    controlRange: { min: 12, max: 16 },
-    status: "out_of_range",
-    correctiveAction: "Re-calibration scheduled",
   });
 
   console.log("Seed done. Admin login: admin@setupai.in / admin123");

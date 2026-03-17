@@ -86,35 +86,6 @@ export interface IStaff {
   createdAt?: Date;
 }
 
-export interface ISOP {
-  _id: Types.ObjectId;
-  organizationId: Types.ObjectId;
-  title: string;
-  content: string;
-  module: string;
-  createdAt?: Date;
-}
-
-export interface IQCLog {
-  _id: Types.ObjectId;
-  organizationId: Types.ObjectId;
-  testName: string;
-  value: number;
-  controlRange: { min: number; max: number };
-  status: "in_range" | "out_of_range";
-  correctiveAction?: string;
-  createdAt?: Date;
-}
-
-export interface IFinancialModel {
-  _id: Types.ObjectId;
-  organizationId: Types.ObjectId;
-  capex: number;
-  opex: number;
-  revenueProjection: number[];
-  breakEvenMonths: number;
-  createdAt?: Date;
-}
 
 export interface ISampleOrder {
   _id: Types.ObjectId;

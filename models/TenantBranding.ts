@@ -144,7 +144,6 @@ const TenantBrandingSchema = new Schema<TenantBrandingDocument>({
         'equipment',
         'staff',
         'qc',
-        'finance',
         'operations'
       ]
     },
@@ -272,7 +271,6 @@ TenantBrandingSchema.statics.createDefaultBranding = async function(organization
         'equipment',
         'staff',
         'qc',
-        'finance',
         'operations'
       ]
     },

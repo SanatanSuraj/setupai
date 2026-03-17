@@ -9,9 +9,6 @@ const plans = [
     features: [
       "Full setup roadmap",
       "Licensing & Compliance",
-      "QC dashboard",
-      "Financial modeling",
-      "SOP builder",
       "Unlimited users",
     ],
     cta: "Get Started",

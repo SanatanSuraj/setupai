@@ -17,11 +17,6 @@ const features = [
     icon: "🔧",
   },
   {
-    title: "QC & SOP System",
-    description: "Pre-built SOP templates, QC value tracking, alerts, and corrective action logging.",
-    icon: "✅",
-  },
-  {
     title: "Financial Modeling",
     description: "CAPEX, OPEX, revenue projection, and break-even analysis in one place.",
     icon: "📊",
@@ -43,7 +38,7 @@ export function Features() {
             Everything you need to go live
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-            One platform for setup, compliance, equipment, QC, and finance.
+            One platform for setup, compliance, equipment, and operations.
           </p>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

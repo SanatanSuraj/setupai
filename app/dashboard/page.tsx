@@ -40,10 +40,10 @@ export default async function DashboardPage() {
               High growth in <span className="text-slate-900 font-bold">Preventive Wellness</span> packages nationally. Wellness.ai suggests adding Vitamin-D and HbA1c to your launch menu.
             </p>
             <Link
-              href="/dashboard/finance"
+              href="/dashboard/roadmap"
               className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
             >
-              View Demand Heatmap →
+              View Setup Roadmap →
             </Link>
           </div>
         </Card>
@@ -134,20 +134,6 @@ export default async function DashboardPage() {
         >
           <h2 className="font-semibold text-foreground">Staff</h2>
           <p className="mt-1 text-sm text-muted-foreground">Roles and benchmarks</p>
-        </Link>
-        <Link
-          href="/dashboard/qc"
-          className="rounded-xl border border-border bg-card p-6 shadow-sm hover:border-primary/30 flex-1 min-w-[140px]"
-        >
-          <h2 className="font-semibold text-foreground">QC & SOP</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Quality control and SOPs</p>
-        </Link>
-        <Link
-          href="/dashboard/finance"
-          className="rounded-xl border border-border bg-card p-6 shadow-sm hover:border-primary/30 flex-1 min-w-[140px]"
-        >
-          <h2 className="font-semibold text-foreground">Finance</h2>
-          <p className="mt-1 text-sm text-muted-foreground">CAPEX, OPEX, break-even</p>
         </Link>
         <Link
           href="/dashboard/operations"

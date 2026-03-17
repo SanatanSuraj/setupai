@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { SampleOrder } from "@/models/SampleOrder";
-import { Equipment } from "@/models/Equipment";
 import { Staff } from "@/models/Staff";
 import connectDB from "@/lib/mongodb";
 
@@ -41,19 +40,6 @@ export async function GET(request: NextRequest) {
     const avgTAT = dailySamples.length > 0 ? 
       dailySamples.reduce((sum, s) => sum + (s.TAT || 24), 0) / dailySamples.length : 0;
 
-    // Equipment calibration status
-    const equipment = await Equipment.find({ organizationId });
-    const calibrationStatus = equipment.map(eq => {
-      const nextDue = new Date();
-      nextDue.setMonth(nextDue.getMonth() + 3); // Assume 3-month calibration cycle
-      
-      return {
-        equipment: eq.name,
-        status: Math.random() > 0.8 ? 'overdue' : Math.random() > 0.6 ? 'due' : 'current',
-        nextDue: nextDue.toISOString().split('T')[0]
-      };
-    });
-
     // Staff metrics
     const staff = await Staff.find({ organizationId });
     const staffMetrics = {
@@ -88,11 +74,6 @@ export async function GET(request: NextRequest) {
         tatCompliance: dailySamples.length > 0 ? Math.round((tatCompliantSamples.length / dailySamples.length) * 100) : 0,
         rejectionRate: dailySamples.length > 0 ? Math.round((rejectedSamples.length / dailySamples.length) * 100) : 0,
         avgTAT: Math.round(avgTAT)
-      },
-      qualityMetrics: {
-        iqcCompliance: 95, // Mock data
-        eqasPerformance: 92, // Mock data
-        calibrationStatus
       },
       bmwTracking,
       staffMetrics,
