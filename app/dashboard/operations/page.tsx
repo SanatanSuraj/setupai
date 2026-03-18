@@ -9,6 +9,7 @@ import {
   X,
   Zap,
   ChevronRight,
+  Activity,
 } from "lucide-react";
 import {
   getSampleOrders,
@@ -32,23 +33,13 @@ const STATUS_FLOW = [
 function PageSkeleton() {
   return (
     <div className="space-y-6 p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-2 animate-pulse">
-          <div className="h-7 w-56 bg-slate-200 rounded-full" />
-          <div className="h-4 w-72 bg-slate-100 rounded-full" />
-        </div>
+      <div className="h-48 rounded-2xl skeleton" />
+      <div className="grid grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-24 rounded-xl skeleton" />
+        ))}
       </div>
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden animate-pulse">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-          <div className="h-9 w-9 bg-slate-200 rounded-lg" />
-          <div className="h-4 w-48 bg-slate-200 rounded-full" />
-        </div>
-        <div className="p-6 space-y-3">
-          {[85, 75, 65, 55].map((w) => (
-            <div key={w} className="h-4 bg-slate-100 rounded-full" style={{ width: `${w}%` }} />
-          ))}
-        </div>
-      </div>
+      <div className="h-64 rounded-2xl skeleton" />
     </div>
   );
 }
@@ -138,8 +129,14 @@ export default function OperationsPage() {
   // ── Loading State ────────────────────────────────────────────────────────────
   if (loading) return <PageSkeleton />;
 
+  const deliveredCount = orders.filter((o) => o.status === "delivered").length;
+  const inProgressCount = orders.filter((o) => o.status !== "delivered").length;
+  const avgTAT = orders.length > 0
+    ? Math.round(orders.filter((o) => o.TAT != null).reduce((sum, o) => sum + (o.TAT ?? 0), 0) / Math.max(orders.filter((o) => o.TAT != null).length, 1))
+    : 0;
+
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
 
       {/* Error Banner */}
       {error && (
@@ -151,16 +148,25 @@ export default function OperationsPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
-            Operations Dashboard
-          </h1>
-          <p className="text-slate-500 text-xs md:text-sm font-medium">
-            Track samples through the complete workflow
-          </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-gray-100">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-50">
+            <Activity size={17} className="text-rose-600" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Operations Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Track samples through the complete workflow</p>
+          </div>
         </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card"><p className="stat-label">Total Orders</p><p className="stat-value mt-1">{orders.length}</p></div>
+        <div className="stat-card"><p className="stat-label">In Progress</p><p className="stat-value mt-1 text-amber-700">{inProgressCount}</p></div>
+        <div className="stat-card"><p className="stat-label">Delivered</p><p className="stat-value mt-1 text-emerald-700">{deliveredCount}</p></div>
+        <div className="stat-card"><p className="stat-label">Avg TAT</p><p className="stat-value mt-1">{avgTAT > 0 ? `${avgTAT}h` : "—"}</p></div>
       </div>
 
       {/* Sample Order Management */}
@@ -184,7 +190,7 @@ export default function OperationsPage() {
           </button>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-4 min-h-[800px]">
           {showForm && (
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -200,7 +206,7 @@ export default function OperationsPage() {
                     placeholder="Enter patient name"
                   />
                 </div>
-                <div className="relative">
+                <div className={`relative ${testDropdownOpen ? "z-50" : ""}`}>
                   <label className="block text-sm font-bold text-slate-700 mb-1">
                     Test Type{" "}
                     {selectedTests.length > 0 && (
@@ -294,7 +300,7 @@ export default function OperationsPage() {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto md:overflow-visible pb-24 md:pb-0">
             <div className="mb-4 p-3 bg-blue-50 rounded-xl border border-blue-100">
               <p className="text-sm text-blue-700 font-medium flex items-center gap-2">
                 <Zap size={14} />
@@ -382,7 +388,7 @@ export default function OperationsPage() {
                       </td>
                       <td className="py-3 px-4">
                         {nextStatus ? (
-                          <div className="relative">
+                          <div className={`relative ${openActionId === order._id ? "z-50" : ""}`}>
                             <button
                               onClick={() =>
                                 setOpenActionId((prev) =>

@@ -41,9 +41,16 @@ export interface IRoadmap {
   _id: Types.ObjectId;
   organizationId: Types.ObjectId;
   tasks: ITask[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  phases?: any[];
   progress: number;
   estimatedCost: number;
   timeline: { start: Date; end: Date };
+  // Lab metadata stored alongside the roadmap
+  labType?: string;
+  state?: string;
+  district?: string;
+  city?: string;
   createdAt?: Date;
 }
 
@@ -74,6 +81,10 @@ export interface IEquipment {
   capex: number;
   maintenanceCost?: number;
   vendorId?: Types.ObjectId;
+  vendor?: string;
+  status?: "planning" | "ordered" | "delivered" | "installed" | "integrated";
+  deliveryDate?: Date;
+  specs?: { power?: number; footprint?: number; amcCost?: number };
   createdAt?: Date;
 }
 

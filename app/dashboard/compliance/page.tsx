@@ -518,51 +518,39 @@ export default function CompliancePage() {
   }
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <>
+      <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
 
-      {/* ── Toast Notifications ── */}
-      <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none">
-        {toasts.map(t => (
-          <div
-            key={t.id}
-            className={`px-4 py-3 rounded-xl shadow-lg text-sm font-semibold pointer-events-auto flex items-center gap-2 animate-in slide-in-from-right-4 fade-in duration-200 ${
-              t.type === "success"
-                ? "bg-emerald-600 text-white"
-                : "bg-rose-600 text-white"
-            }`}
-          >
-            {t.type === "success"
-              ? <CheckCircle2 size={15} className="shrink-0" />
-              : <XCircle      size={15} className="shrink-0" />}
-            {t.message}
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-gray-100">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50">
+            <ShieldCheck size={17} className="text-teal-600" />
           </div>
-        ))}
-      </div>
-
-      {/* ── Header ── */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Compliance Center</h1>
-          <p className="text-slate-500 text-xs md:text-sm font-medium mt-0.5">
-            Track regulatory gates, BMW authorization, and go-live readiness.
-          </p>
+          <div>
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Compliance Center</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Track regulatory gates, BMW authorization, and go-live readiness.
+            </p>
+          </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => setShowInitForm(true)}
-            className="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 flex items-center gap-2"
-          >
-            <Zap size={16} /> Initialize Gates
+        <div className="flex gap-2 shrink-0 flex-wrap">
+          <button onClick={() => setShowInitForm(true)} className="btn-secondary btn-sm">
+            <Zap size={13} /> Initialize Gates
           </button>
-          <button
-            onClick={runValidation}
-            disabled={validating}
-            className="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-sm hover:bg-blue-700 flex items-center gap-2 disabled:opacity-60"
-          >
-            <RefreshCw size={16} className={validating ? "animate-spin" : ""} />
+          <button onClick={runValidation} disabled={validating} className="btn-primary btn-sm">
+            <RefreshCw size={13} className={validating ? "animate-spin" : ""} />
             {validating ? "Validating…" : "Run Validation"}
           </button>
         </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card"><p className="stat-label">Total Gates</p><p className="stat-value mt-1">{readiness ? totalGates : "—"}</p></div>
+        <div className="stat-card"><p className="stat-label">Passed</p><p className="stat-value mt-1 text-emerald-700">{readiness ? passedGates : "—"}</p></div>
+        <div className="stat-card"><p className="stat-label">Critical Blockers</p><p className={`stat-value mt-1 ${criticalBlockerCount > 0 ? "text-red-600" : "text-gray-300"}`}>{readiness ? criticalBlockerCount : "—"}</p></div>
+        <div className="stat-card"><p className="stat-label">Compliance Score</p><p className="stat-value mt-1 text-blue-700">{readiness ? `${Math.round(overallCompletion)}%` : "—"}</p></div>
       </div>
 
       {/* ── Errors / Messages ── */}
@@ -642,31 +630,20 @@ export default function CompliancePage() {
         </div>
       )}
 
-      {/* ── Stats Row (computed values) ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Gates</p>
-          <p className="text-2xl font-black text-slate-800">{readiness ? totalGates : "—"}</p>
+      {/* ── BMW Quick Status ── */}
+      {derivedBmwStatus && (
+        <div className="p-4 bg-white border border-slate-200 rounded-xl flex items-center gap-3 shadow-sm">
+          <div className={`p-2 rounded-lg ${derivedBmwStatus.canProceed ? "bg-emerald-50" : "bg-rose-50"}`}>
+            <ShieldCheck size={16} className={derivedBmwStatus.canProceed ? "text-emerald-600" : "text-rose-500"} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">BMW Authorization Status</p>
+            <p className={`text-sm font-bold capitalize ${derivedBmwStatus.canProceed ? "text-emerald-600" : "text-rose-600"}`}>
+              {derivedBmwStatus.status?.replace(/_/g, " ") ?? "Not Started"}
+            </p>
+          </div>
         </div>
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Passed</p>
-          <p className="text-2xl font-black text-emerald-600">{readiness ? passedGates : "—"}</p>
-        </div>
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Critical Blockers</p>
-          <p className={`text-2xl font-black ${criticalBlockerCount > 0 ? "text-rose-600" : "text-slate-300"}`}>
-            {readiness ? criticalBlockerCount : "—"}
-          </p>
-        </div>
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">BMW Status</p>
-          <p className={`text-sm font-black mt-1 capitalize ${
-            derivedBmwStatus?.canProceed ? "text-emerald-600" : "text-rose-600"
-          }`}>
-            {derivedBmwStatus?.status?.replace(/_/g, " ") ?? "Not Started"}
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* ── Validation Report ── */}
       {report && (
@@ -1109,6 +1086,26 @@ export default function CompliancePage() {
           </div>
         </Card>
       )}
+      </div>
+
+      {/* ── Toast Notifications ── */}
+      <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none">
+        {toasts.map(t => (
+          <div
+            key={t.id}
+            className={`px-4 py-3 rounded-xl shadow-lg text-sm font-semibold pointer-events-auto flex items-center gap-2 animate-in slide-in-from-right-4 fade-in duration-200 ${
+              t.type === "success"
+                ? "bg-emerald-600 text-white"
+                : "bg-rose-600 text-white"
+            }`}
+          >
+            {t.type === "success"
+              ? <CheckCircle2 size={15} className="shrink-0" />
+              : <XCircle      size={15} className="shrink-0" />}
+            {t.message}
+          </div>
+        ))}
+      </div>
 
       {/* ── BMW Form Modal (UNCHANGED) ── */}
       {showBMWForm && (
@@ -1342,6 +1339,6 @@ export default function CompliancePage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -397,17 +397,16 @@ export default function NABLPage() {
           setAudits(data.auditSchedule);
         if (data.documentControl)
           setDocControl(data.documentControl);
+        if (data.checklist)
+          setCheckedItems(data.checklist);
       })
       .catch(() => {});
-
-    const saved = localStorage.getItem("nabl_checklist");
-    if (saved) setCheckedItems(JSON.parse(saved));
   }, []);
 
   const toggleCheck = (key: string) => {
     setCheckedItems((prev) => {
       const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem("nabl_checklist", JSON.stringify(next));
+      postAction("update_checklist", next);
       return next;
     });
   };
@@ -473,21 +472,22 @@ export default function NABLPage() {
   ];
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
       {error && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 flex items-center justify-between">
-          {error}<button onClick={() => setError(null)}><X size={16} /></button>
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-rose-400 hover:text-rose-600"><X size={16} /></button>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">NABL Accreditation</h1>
-          <p className="text-slate-500 text-xs md:text-sm font-medium">ISO 15189:2022 Medical Laboratories — all sections editable by lab owner</p>
+      {/* Page Header */}
+      <div className="flex items-start gap-3 pb-6 border-b border-gray-100">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-50">
+          <Award size={17} className="text-amber-600" />
         </div>
-        <div className="flex gap-3">
-
+        <div>
+          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">NABL Accreditation</h1>
+          <p className="text-sm text-gray-500 mt-0.5">ISO 15189:2022 Medical Laboratories — all sections editable by lab owner</p>
         </div>
       </div>
 

@@ -52,8 +52,8 @@ export default function LandingPage() {
                         <Link href="/contact" className="hover:text-blue-600 transition">Contact</Link>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button className="text-sm font-semibold text-slate-700 px-4 py-2">Log In</button>
-                        <Link href="/dashboard" className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-full hover:bg-blue-700 transition">Get Started</Link>
+                        <Link href="/login" className="text-sm font-semibold text-slate-700 px-4 py-2 hover:text-blue-600 transition">Log In</Link>
+                        <Link href="/register" className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-full hover:bg-blue-700 transition">Get Started</Link>
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@ export default function LandingPage() {
                     Stop worrying about paperwork. We help you get your licenses, pick the right equipment, and follow the law—all in one simple app.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-                    <Link href="/dashboard" className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-xl shadow-blue-200">
+                    <Link href="/register" className="bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-xl shadow-blue-200">
                         See your setup plan <i className="fas fa-arrow-right text-sm"></i>
                     </Link>
                     <Link href="/contact" className="bg-white border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-blue-600 transition">
@@ -269,9 +269,9 @@ export default function LandingPage() {
                 </div>
                 
                 <div className="text-center mt-20">
-                    <button className="bg-white text-slate-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition shadow-xl">
+                    <Link href="/register" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition shadow-xl">
                         Generate Your Roadmap Now
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>
@@ -379,21 +379,21 @@ export default function LandingPage() {
                         <h3 className="font-bold text-lg mb-2">Free Plan</h3>
                         <div className="text-3xl font-bold mb-4">₹0</div>
                         <p className="text-sm text-slate-500 mb-8">Basic plan to see your roadmap.</p>
-                        <button className="w-full border-2 border-slate-200 py-3 rounded-lg font-bold hover:border-blue-600 transition">Try for Free</button>
+                        <Link href="/register" className="block w-full border-2 border-slate-200 py-3 rounded-lg font-bold hover:border-blue-600 transition text-center">Try for Free</Link>
                     </div>
                     
                     <div className="bg-white p-8 rounded-2xl border-2 border-blue-600 shadow-xl">
                         <h3 className="font-bold text-lg mb-2">Setup Pro</h3>
                         <div className="text-3xl font-bold mb-4">Subscription</div>
                         <p className="text-sm text-slate-500 mb-8 font-semibold">Best for single lab owners.</p>
-                        <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Get Pro</button>
+                        <Link href="/register" className="block w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition text-center">Get Pro</Link>
                     </div>
                     
                     <div className="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800">
                         <h3 className="font-bold text-lg mb-2">Enterprise</h3>
                         <div className="text-3xl font-bold mb-4">Custom</div>
                         <p className="text-sm text-slate-400 mb-8">For multiple labs or franchises.</p>
-                        <button className="w-full bg-white text-slate-900 py-3 rounded-lg font-bold hover:bg-slate-200 transition">Talk to Sales</button>
+                        <Link href="/contact" className="block w-full bg-white text-slate-900 py-3 rounded-lg font-bold hover:bg-slate-200 transition text-center">Talk to Sales</Link>
                     </div>
                 </div>
             </div>
@@ -411,7 +411,7 @@ export default function LandingPage() {
                 <div className="flex justify-center gap-6 text-sm text-slate-500 mb-8 font-medium">
                     <a href="#pricing" className="hover:text-blue-600 transition">Pricing</a>
                     <Link href="/contact" className="hover:text-blue-600 transition">Contact</Link>
-                    <button className="hover:text-blue-600 transition">Login</button>
+                    <Link href="/login" className="hover:text-blue-600 transition">Login</Link>
                 </div>
                 <p className="text-sm text-slate-500 mb-8">Helping India start better diagnostic labs.</p>
                 <p className="text-xs text-slate-400">© 2026 SetupAI Platform. All information verified for Indian states.</p>

@@ -3,10 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { GoLiveGate } from "@/models/GoLiveGate";
 import { ComplianceGate } from "@/models/ComplianceGate";
-import { Organization } from "@/models/Organization";
+import { NablChecklist } from "@/models/NablChecklist";
 import { connectDB } from "@/lib/mongodb";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
@@ -42,24 +42,94 @@ export async function GET(request: NextRequest) {
     else if (readinessScore < 95) phase = 'assessment';
     else phase = 'accredited';
 
-    // Quality manual sections — all start as pending until the lab owner updates them
-    const qualityManualSections = [
-      { name: 'Quality Policy & Objectives', status: 'pending' },
-      { name: 'Document Control', status: 'pending' },
-      { name: 'Management Responsibility', status: 'pending' },
-      { name: 'Resource Management', status: 'pending' },
-      { name: 'Pre-examination Processes', status: 'pending' },
-      { name: 'Examination Processes', status: 'pending' },
-      { name: 'Post-examination Processes', status: 'pending' },
-      { name: 'Management System Improvement', status: 'pending' }
+    // Quality manual: read actual status from GoLiveGate records
+    const QUALITY_SECTIONS = [
+      'Quality Policy & Objectives',
+      'Document Control',
+      'Management Responsibility',
+      'Resource Management',
+      'Pre-examination Processes',
+      'Examination Processes',
+      'Post-examination Processes',
+      'Management System Improvement',
     ];
 
-    const completedSections = qualityManualSections.filter(s => s.status === 'completed').length;
+    const qualityManualGate = await GoLiveGate.findOne({
+      organizationId,
+      name: 'Quality Manual Approved',
+      gateType: 'quality_manual',
+    }).lean();
+
+    // Build section list; mark as 'completed' if the gate has been passed
+    // and any sectionName stored in details matches, else treat gate-level pass
+    // as all sections completed.
+    const lastUpdatedSection: string | undefined =
+      (qualityManualGate?.details as { lastUpdatedSection?: string } | undefined)
+        ?.lastUpdatedSection;
+
+    const qualityManualSections = QUALITY_SECTIONS.map((name) => ({
+      name,
+      status:
+        qualityManualGate?.status === 'passed'
+          ? 'completed'
+          : name === lastUpdatedSection
+          ? 'in_progress'
+          : 'pending',
+    }));
+
+    const completedSections = qualityManualSections.filter(
+      (s) => s.status === 'completed'
+    ).length;
     const overallCompletion = (completedSections / qualityManualSections.length) * 100;
 
-    // Proficiency tests, audits start empty — lab owner adds them
-    const proficiencyTests: unknown[] = [];
-    const auditSchedule: unknown[] = [];
+    // Proficiency tests: read from GoLiveGates of type 'nabl_readiness' that have
+    // PT-specific naming. Map to frontend shape: testName, provider, dueDate, status, score
+    const ptGates = await GoLiveGate.find({
+      organizationId,
+      name: /^PT Enrollment - /,
+    }).lean();
+    const proficiencyTests = ptGates.map((g) => {
+      const d = g.details as { provider?: string; dueDate?: string; enrollmentDate?: string; score?: number } | undefined;
+      return {
+        testName: g.name.replace('PT Enrollment - ', ''),
+        provider: d?.provider ?? '',
+        dueDate: d?.dueDate ?? d?.enrollmentDate ?? '',
+        status: g.status === 'passed' ? 'completed' : (g.status === 'failed' ? 'overdue' : g.status),
+        score: d?.score,
+      };
+    });
+
+    // Audit schedule: read from GoLiveGates of type 'internal_audit'
+    // Map to frontend shape: type, date, auditor, status
+    const auditGates = await GoLiveGate.find({
+      organizationId,
+      gateType: 'internal_audit',
+    }).lean();
+    const auditSchedule = auditGates.map((g) => {
+      const d = g.details as { scheduledDate?: string; date?: string; auditor?: string } | undefined;
+      return {
+        type: g.name.replace('Internal Audit - ', ''),
+        date: d?.scheduledDate ?? d?.date ?? '',
+        auditor: d?.auditor ?? '',
+        status: g.status === 'passed' ? 'completed' : g.status,
+      };
+    });
+
+    // Document checklist: persisted checkbox state per section-item (e.g. "A-0", "B-3")
+    // PRIMARY: Read from NablChecklist (canonical store for checkbox state)
+    // FALLBACK: GoLiveGate.details.checklist for backwards compatibility
+    let checklist: Record<string, boolean> = {};
+    const nablChecklistDoc = await NablChecklist.findOne({ organizationId }).lean();
+    if (nablChecklistDoc?.checkedItems && typeof nablChecklistDoc.checkedItems === 'object') {
+      checklist = nablChecklistDoc.checkedItems;
+    } else {
+      const checklistGate = await GoLiveGate.findOne({
+        organizationId,
+        gateType: 'nabl_document_checklist',
+      }).lean();
+      checklist =
+        (checklistGate?.details as { checklist?: Record<string, boolean> } | undefined)?.checklist ?? {};
+    }
 
     // Document control starts at zero
     const documentControl = {
@@ -84,14 +154,26 @@ export async function GET(request: NextRequest) {
     estimatedAccreditationDate.setMonth(estimatedAccreditationDate.getMonth() + 
       Math.ceil((100 - readinessScore) / 10));
 
+    // Readiness score driven by checklist completion when available
+    const checklistKeys = Object.keys(checklist);
+    const checklistChecked = checklistKeys.filter((k) => checklist[k]).length;
+    const totalChecklistItems = 180; // DOCUMENT_SECTIONS total in frontend
+    const checklistDrivenScore = checklistKeys.length > 0
+      ? Math.round((checklistChecked / totalChecklistItems) * 100)
+      : readinessScore;
+    const effectivePhase =
+      checklistDrivenScore < 40 ? 'preparation' :
+      checklistDrivenScore < 70 ? 'application' :
+      checklistDrivenScore < 90 ? 'assessment' : 'accredited';
+
     return NextResponse.json({
       success: true,
       nablStatus: {
-        readinessScore: Math.round(readinessScore),
-        phase,
-        nextMilestone: phase === 'preparation' ? 'Complete Quality Manual' :
-                      phase === 'application' ? 'Submit NABL Application' :
-                      phase === 'assessment' ? 'Assessment Visit' : 'Maintain Accreditation',
+        readinessScore: Math.round(checklistDrivenScore),
+        phase: effectivePhase,
+        nextMilestone: effectivePhase === 'preparation' ? 'Complete Quality Manual' :
+                      effectivePhase === 'application' ? 'Submit NABL Application' :
+                      effectivePhase === 'assessment' ? 'Assessment Visit' : 'Maintain Accreditation',
         estimatedAccreditationDate: estimatedAccreditationDate.toISOString().split('T')[0]
       },
       qualityManual: {
@@ -102,6 +184,7 @@ export async function GET(request: NextRequest) {
       auditSchedule,
       documentControl,
       nablRequirements,
+      checklist,
       lastUpdated: new Date().toISOString()
     });
   } catch (error) {
@@ -128,6 +211,22 @@ export async function POST(request: NextRequest) {
     const organizationId = session.user.organizationId;
 
     switch (action) {
+      case 'update_checklist': {
+        const checkedItems = (data && typeof data === 'object' && !Array.isArray(data))
+          ? (data as Record<string, boolean>)
+          : {};
+        const result = await NablChecklist.findOneAndUpdate(
+          { organizationId },
+          { $set: { checkedItems } },
+          { upsert: true, new: true }
+        );
+        console.log("[NABL] Checklist persisted to NablChecklist:", Object.keys(checkedItems).filter((k) => checkedItems[k]).length, "items checked");
+        if (!result) {
+          console.error("[NABL] NablChecklist upsert returned null");
+        }
+        break;
+      }
+
       case 'update_quality_manual':
         // Update quality manual section status
         const { sectionName, status } = data;
@@ -144,15 +243,13 @@ export async function POST(request: NextRequest) {
             isHardGate: false,
             details: { lastUpdatedSection: sectionName }
           },
-          { upsert: true }
+          { upsert: true, new: true }
         );
         break;
 
       case 'schedule_audit':
         // Schedule internal audit
         const { auditType, date, auditor } = data;
-        
-        // Create audit record (in real implementation, would use Audit model)
         await GoLiveGate.findOneAndUpdate(
           { organizationId, name: `Internal Audit - ${auditType}` },
           {
@@ -161,28 +258,32 @@ export async function POST(request: NextRequest) {
             gateType: 'internal_audit',
             status: 'pending',
             isHardGate: false,
-            details: { scheduledDate: date, auditor }
+            details: { scheduledDate: date, date, auditor },
           },
-          { upsert: true }
+          { upsert: true, new: true }
         );
         break;
 
       case 'enroll_proficiency_test':
         // Enroll in proficiency testing program
-        const { testName, provider } = data;
-        
-        // Create PT enrollment record
+        const { testName, provider, dueDate, status: ptStatus, score } = data;
+        const ptStatusMapped = ptStatus === 'completed' ? 'passed' : ptStatus === 'overdue' ? 'failed' : 'pending';
         await GoLiveGate.findOneAndUpdate(
           { organizationId, name: `PT Enrollment - ${testName}` },
           {
             organizationId,
             name: `PT Enrollment - ${testName}`,
             gateType: 'nabl_readiness',
-            status: 'pending',
+            status: ptStatusMapped,
             isHardGate: false,
-            details: { provider, enrollmentDate: new Date() }
+            details: {
+              provider,
+              enrollmentDate: new Date(),
+              dueDate: dueDate || new Date().toISOString().split('T')[0],
+              score,
+            },
           },
-          { upsert: true }
+          { upsert: true, new: true }
         );
         break;
 

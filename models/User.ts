@@ -1,5 +1,6 @@
 import mongoose, { Schema, Model } from "mongoose";
 import type { IUser, UserRole } from "@/types";
+import { auditPlugin } from "@/lib/mongoose-plugins";
 
 const UserSchema = new Schema<IUser>(
   {
@@ -12,5 +13,7 @@ const UserSchema = new Schema<IUser>(
   },
   { timestamps: true }
 );
+
+UserSchema.plugin(auditPlugin);
 
 export const User: Model<IUser> = mongoose.models.User ?? mongoose.model<IUser>("User", UserSchema);

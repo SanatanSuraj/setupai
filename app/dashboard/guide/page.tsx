@@ -28,34 +28,35 @@ export default function GuidePage() {
   return (
     <div className="space-y-8 p-6 md:p-8 max-w-5xl mx-auto">
 
-      {/* Hero */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50" />
-        <div className="relative z-10 p-8 md:p-12">
-          <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-blue-200 text-xs font-bold uppercase tracking-wider mb-6">
-            India — All States &amp; UTs
-          </span>
-          <h1 className="text-2xl md:text-4xl font-black tracking-tight leading-tight">
-            Setting Up a Diagnostic Laboratory in India
-          </h1>
-          <p className="text-slate-300 mt-3 text-lg font-medium">
-            A complete regulatory, infrastructure &amp; operational guide
-          </p>
-          <div className="flex items-center gap-2 mt-4 text-slate-400 text-sm">
-            <Info size={16} className="text-blue-400 shrink-0" />
-            <span>Licensing authorities and portals vary by state. Always verify with your District CMO or State Health Department.</span>
+      {/* Page Header */}
+      <div className="flex items-start gap-3 pb-6 border-b border-gray-100">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50">
+          <BookOpen size={17} className="text-sky-600" />
+        </div>
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Setup Guide</h1>
+            <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-semibold text-gray-500">
+              India — All States &amp; UTs
+            </span>
           </div>
+          <p className="text-sm text-gray-500 mt-0.5">
+            A complete regulatory, infrastructure &amp; operational guide for diagnostic labs.
+          </p>
+          <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+            <Info size={11} className="text-blue-400 shrink-0" />
+            Licensing authorities vary by state. Verify with your District CMO.
+          </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1.5 bg-slate-100 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
         <button
           onClick={() => setTab("quick")}
-          className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${
+          className={`px-4 py-2 rounded-md font-medium text-sm transition-all duration-150 ${
             tab === "quick"
-              ? "bg-white text-slate-900 shadow-sm"
+              ? "bg-white text-gray-900 shadow-xs"
               : "text-slate-600 hover:text-slate-800"
           }`}
         >
@@ -63,10 +64,10 @@ export default function GuidePage() {
         </button>
         <button
           onClick={() => setTab("comprehensive")}
-          className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${
+          className={`px-4 py-2 rounded-md font-medium text-sm transition-all duration-150 ${
             tab === "comprehensive"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-600 hover:text-slate-800"
+              ? "bg-white text-gray-900 shadow-xs"
+              : "text-gray-500 hover:text-gray-700"
           }`}
         >
           Comprehensive Guide

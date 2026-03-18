@@ -5,11 +5,8 @@ import { Card } from "@/components/dashboard/Card";
 import { Badge } from "@/components/dashboard/Badge";
 import {
   Users,
-  GraduationCap,
-  HeartPulse,
   ShieldCheck,
   UserPlus,
-  AlertCircle,
   TrendingUp,
   Pencil,
   Save,
@@ -42,12 +39,6 @@ const ROLE_OPTIONS: Array<{ id: StaffRole; label: string }> = [
 
 const TRAINING_OPTIONS: TrainingStatus[] = ["pending", "in-progress", "certified", "expired"];
 
-const MANDATORY_TRAINING = [
-  { title: "BMW Management & Segregation", status: "Done", date: "Feb 10" },
-  { title: "Infection Control & PPE Usage", status: "Done", date: "Feb 12" },
-  { title: "Fire Safety & Evacuation Drill", status: "Pending", date: "Feb 25" },
-  { title: "Needle Stick Injury Protocol", status: "Done", date: "Feb 15" },
-];
 
 export default function StaffPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -144,7 +135,8 @@ export default function StaffPage() {
       body: JSON.stringify(draft),
     });
     if (res.ok) {
-      const updated = await res.json();
+      const json = await res.json();
+      const updated = json.data ?? json;
       setStaff((prev) => prev.map((s) => (s._id === editingId ? { ...s, ...updated } : s)));
       cancelEdit();
     } else {
@@ -168,32 +160,47 @@ export default function StaffPage() {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-8">
-        <p className="text-muted-foreground">Loading…</p>
+      <div className="p-6 md:p-8 space-y-4">
+        <div className="h-48 rounded-2xl skeleton" />
+        <div className="grid grid-cols-3 gap-4">
+          {[1,2,3].map((i) => <div key={i} className="h-24 rounded-xl skeleton" />)}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <>
+      <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
       {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
-          {error}
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-rose-400 hover:text-rose-600">×</button>
         </div>
       )}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Staffing & HR Management</h1>
-          <p className="text-slate-500 text-xs md:text-sm font-medium">Regulatory compliance for healthcare personnel</p>
+
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-gray-100">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50">
+            <Users size={17} className="text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Staffing &amp; HR</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Regulatory compliance for healthcare personnel</p>
+          </div>
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="flex-1 md:flex-none px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm shadow-sm hover:bg-slate-50 flex items-center justify-center gap-2"
-          >
-            <UserPlus size={18} /> Add Staff
-          </button>
-        </div>
+        <button onClick={() => setShowForm((v) => !v)} className="btn-primary shrink-0">
+          <UserPlus size={14} /> Add Staff Member
+        </button>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card"><p className="stat-label">Total Staff</p><p className="stat-value mt-1">{stats.total}</p></div>
+        <div className="stat-card"><p className="stat-label">Mandatory Roles</p><p className="stat-value mt-1">{stats.mandatory}</p></div>
+        <div className="stat-card"><p className="stat-label">Certified</p><p className="stat-value mt-1 text-emerald-700">{stats.certified}</p></div>
+        <div className="stat-card"><p className="stat-label">Training Pending</p><p className="stat-value mt-1 text-amber-700">{stats.pending}</p></div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -396,6 +403,7 @@ export default function StaffPage() {
           </Card>
         </div>
       </div>
+      </div>
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -506,7 +514,6 @@ export default function StaffPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
-

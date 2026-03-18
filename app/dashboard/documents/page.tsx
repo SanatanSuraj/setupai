@@ -258,14 +258,26 @@ export default function DocumentsPage() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
+    <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
 
-      {/* Header */}
-      <div>
-        <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Documents</h1>
-        <p className="text-slate-500 text-xs md:text-sm font-medium mt-0.5">
-          Generate regulatory documents and validate compliance submissions using AI.
-        </p>
+      {/* Page Header */}
+      <div className="flex items-start gap-3 pb-6 border-b border-gray-100">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50">
+          <FileText size={17} className="text-orange-600" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Documents &amp; AI Validation</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Generate regulatory documents and validate compliance submissions using AI.
+          </p>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="stat-card"><p className="stat-label">Doc Templates</p><p className="stat-value mt-1">{docTypes.length}</p></div>
+        <div className="stat-card"><p className="stat-label">AI Validation</p><p className="stat-value mt-1 text-emerald-700">Live</p></div>
+        <div className="stat-card"><p className="stat-label">Gap Analysis</p><p className="stat-value mt-1 text-blue-700">On</p></div>
       </div>
 
       {/* Main Tabs */}

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { Equipment } from "@/models/Equipment";
 import { connectDB } from "@/lib/mongodb";
+import { apiError, unauthorized, notFound, newRequestId } from "@/lib/db-helpers";
 
 const VALID_STATUSES = ["planning", "ordered", "delivered", "installed", "integrated"];
 
@@ -10,19 +11,18 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const requestId = newRequestId();
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!session?.user?.organizationId) return unauthorized(requestId);
 
     const body = await request.json();
     const { name, category, capex, maintenanceCost, status, deliveryDate } = body;
 
     if (status && !VALID_STATUSES.includes(status)) {
-      return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}` },
-        { status: 400 }
+      return apiError(
+        `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`,
+        { status: 400, requestId }
       );
     }
 
@@ -38,25 +38,19 @@ export async function PATCH(
           ...(maintenanceCost !== undefined && { maintenanceCost }),
           ...(status && { status }),
           ...(deliveryDate && { deliveryDate: new Date(deliveryDate) }),
+          updatedBy: session.user.id ?? null,
+          requestId,
         },
       },
-      { new: true }
+      { new: true, runValidators: true, context: "query" }
     );
 
-    if (!equipment) {
-      return NextResponse.json(
-        { error: "Equipment not found" },
-        { status: 404 }
-      );
-    }
+    if (!equipment) return notFound("Equipment not found", requestId);
 
-    return NextResponse.json(equipment);
+    return NextResponse.json({ data: equipment, requestId });
   } catch (error) {
-    console.error("Error updating equipment:", error);
-    return NextResponse.json(
-      { error: "Failed to update equipment" },
-      { status: 500 }
-    );
+    console.error("[PATCH /api/equipment/:id]", error);
+    return apiError("Failed to update equipment", { status: 500, requestId, detail: error });
   }
 }
 
@@ -64,11 +58,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const requestId = newRequestId();
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!session?.user?.organizationId) return unauthorized(requestId);
 
     await connectDB();
 
@@ -77,19 +70,11 @@ export async function DELETE(
       organizationId: session.user.organizationId,
     });
 
-    if (!equipment) {
-      return NextResponse.json(
-        { error: "Equipment not found" },
-        { status: 404 }
-      );
-    }
+    if (!equipment) return notFound("Equipment not found", requestId);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, requestId });
   } catch (error) {
-    console.error("Error deleting equipment:", error);
-    return NextResponse.json(
-      { error: "Failed to delete equipment" },
-      { status: 500 }
-    );
+    console.error("[DELETE /api/equipment/:id]", error);
+    return apiError("Failed to delete equipment", { status: 500, requestId, detail: error });
   }
 }

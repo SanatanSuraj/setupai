@@ -13,9 +13,14 @@ export default async function DashboardLayout({
   if (!session) redirect("/login");
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-[#f7f8fa]">
       <Sidebar />
-      <main className="flex-1 overflow-auto bg-background">{children}</main>
+      {/* Right content column */}
+      <div className="flex flex-1 flex-col min-w-0">
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
       <GamifiedGuide />
     </div>
   );

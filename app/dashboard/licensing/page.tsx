@@ -8,7 +8,6 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
   ExternalLink,
   Clock,
   ShieldAlert,
@@ -116,7 +115,8 @@ export default function LicensingPage() {
       body: JSON.stringify({ status }),
     });
     if (res.ok) {
-      const updated = await res.json();
+      const json = await res.json();
+      const updated = json.data ?? json;
       setLicenses((prev) => prev.map((l) => (l._id === id ? { ...l, ...updated } : l)));
     }
   };
@@ -158,44 +158,40 @@ export default function LicensingPage() {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-8">
-        <p className="text-muted-foreground">Loading licensing module…</p>
+      <div className="p-6 md:p-8 space-y-4">
+        <div className="h-48 rounded-2xl skeleton" />
+        <div className="grid grid-cols-4 gap-4">
+          {[1,2,3,4].map((i) => <div key={i} className="h-20 rounded-xl skeleton" />)}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-6 md:p-8">
-      {/* Header + Stats - Full width */}
-      <div>
-        <div className="mb-6">
-          <h1 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Licensing & Compliance</h1>
-          <p className="text-slate-500 text-xs md:text-sm font-medium mt-0.5">
-            Browse available licenses, apply for the ones you need, and track status in one place.
+    <>
+      <div className="space-y-6 p-6 md:p-8 animate-fade-in-up">
+      {/* Page Header */}
+      <div className="flex items-start gap-3 pb-6 border-b border-gray-100">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50">
+          <FileCheck size={17} className="text-indigo-600" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Licensing &amp; Compliance</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Browse, apply, and track all lab licenses in one place.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-          <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
-            <p className="text-2xl font-black text-slate-800">{stats.total}</p>
-          </div>
-          <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Approved</p>
-            <p className="text-2xl font-black text-emerald-600">{stats.approved}</p>
-          </div>
-          <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pending</p>
-            <p className="text-2xl font-black text-blue-600">{stats.pending}</p>
-          </div>
-          <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Renewal Alerts</p>
-            <div className="flex items-center gap-2">
-              <p className={`text-2xl font-black ${stats.critical > 0 ? "text-rose-600" : "text-slate-300"}`}>{stats.critical}</p>
-              {stats.critical > 0 && <AlertCircle size={20} className="text-rose-500 animate-pulse" />}
-            </div>
-          </div>
-        </div>
       </div>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="stat-card"><p className="stat-label">Total Applied</p><p className="stat-value mt-1">{stats.total}</p></div>
+        <div className="stat-card"><p className="stat-label">Approved</p><p className="stat-value mt-1 text-emerald-700">{stats.approved}</p></div>
+        <div className="stat-card"><p className="stat-label">Pending</p><p className="stat-value mt-1 text-blue-700">{stats.pending}</p></div>
+        <div className="stat-card"><p className="stat-label">Renewal Alerts</p><p className={`stat-value mt-1 ${stats.critical > 0 ? "text-red-600" : "text-gray-300"}`}>{stats.critical}</p></div>
+      </div>
+
+      
 
       {/* Two columns: Catalog | License Tracker */}
       <div className="flex flex-col lg:flex-row gap-6">
@@ -392,6 +388,7 @@ export default function LicensingPage() {
         </div>
       </aside>
       </div>
+      </div>
 
       {/* Apply Modal */}
       {applyModal && (
@@ -434,6 +431,6 @@ export default function LicensingPage() {
         </div>
       )}
 
-    </div>
+    </>
   );
 }

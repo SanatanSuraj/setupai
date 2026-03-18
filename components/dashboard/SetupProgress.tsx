@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
 import Link from "next/link";
-
-const ROADMAP_STORAGE_KEY = "roadmap_phases_v3";
+import { ArrowRight } from "lucide-react";
 
 const STATIC_PHASES = [
   {
@@ -66,19 +64,14 @@ export function SetupProgress() {
   const [phases, setPhases] = useState(STATIC_PHASES);
 
   useEffect(() => {
-    const saved = localStorage.getItem(ROADMAP_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const valid =
-          Array.isArray(parsed) &&
-          parsed.length === STATIC_PHASES.length &&
-          parsed[0]?.title?.startsWith("Phase 1:");
-        if (valid) setPhases(parsed);
-      } catch (e) {
-        console.error("Failed to parse roadmap phases", e);
-      }
-    }
+    fetch("/api/roadmap")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && data.phases && Array.isArray(data.phases) && data.phases.length > 0) {
+          setPhases(data.phases);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const taskCount = phases.reduce((acc, p) => acc + p.tasks.length, 0);
@@ -89,37 +82,76 @@ export function SetupProgress() {
   const progress = taskCount > 0 ? Math.round((completedCount / taskCount) * 100) : 0;
 
   let nextTask = "All tasks completed!";
+  let nextPhaseTitle = "";
   for (const phase of phases) {
     const pending = phase.tasks.find((t) => !t.done);
     if (pending) {
       nextTask = pending.name;
+      nextPhaseTitle = phase.title.split(":")[0];
       break;
     }
   }
 
+  // Active phase index
+  const activePhaseIdx = phases.findIndex((p) => p.tasks.some((t) => !t.done));
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-end">
-        <span className="text-3xl font-black text-slate-900 tracking-tight">{progress}%</span>
-        <span className="text-xs text-slate-500 font-bold">
-          {completedCount} / {taskCount} tasks
-        </span>
+      {/* Progress number + bar */}
+      <div>
+        <div className="flex items-end justify-between mb-2">
+          <div>
+            <span className="text-3xl font-bold text-gray-900 tracking-tight">{progress}</span>
+            <span className="text-lg font-semibold text-gray-400 ml-0.5">%</span>
+          </div>
+          <span className="text-xs text-gray-400 font-medium mb-1">
+            {completedCount} / {taskCount}
+          </span>
+        </div>
+        <div className="relative h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-blue-600 transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
-      <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-        <div
-          className="bg-blue-600 h-full transition-all duration-700 shadow-sm shadow-blue-200"
-          style={{ width: `${progress}%` }}
-        />
+
+      {/* Phase dots */}
+      <div className="flex items-center gap-1">
+        {phases.map((phase, i) => {
+          const phaseDone = phase.tasks.every((t) => t.done);
+          const isActive = i === activePhaseIdx;
+          return (
+            <div
+              key={i}
+              title={phase.title}
+              className={`flex-1 h-1 rounded-full transition-colors ${
+                phaseDone
+                  ? "bg-blue-600"
+                  : isActive
+                  ? "bg-blue-300"
+                  : "bg-gray-100"
+              }`}
+            />
+          );
+        })}
       </div>
-      <p className="text-[11px] text-slate-500 flex items-center gap-1.5 font-semibold">
-        <Clock size={12} className="text-blue-500 shrink-0" />
-        <span className="truncate">Next: {nextTask}</span>
-      </p>
+
+      {/* Next task */}
+      {nextTask !== "All tasks completed!" && (
+        <div className="rounded-lg bg-gray-50 border border-gray-100 p-3">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+            Next up · {nextPhaseTitle}
+          </p>
+          <p className="text-xs text-gray-700 font-medium line-clamp-2">{nextTask}</p>
+        </div>
+      )}
+
       <Link
         href="/dashboard/roadmap"
-        className="inline-block text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+        className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
       >
-        View full roadmap →
+        View roadmap <ArrowRight size={12} />
       </Link>
     </div>
   );

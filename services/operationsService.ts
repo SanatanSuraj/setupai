@@ -92,5 +92,6 @@ export async function updateOrderStatus(
     body: JSON.stringify({ status }),
   });
   if (!res.ok) throw new Error(`Update order failed: ${res.status}`);
-  return res.json();
+  const json = await res.json();
+  return (json.data ?? json) as SampleOrder;
 }

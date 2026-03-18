@@ -9,7 +9,6 @@ import {
   ArrowRight,
   CheckCircle2,
   XCircle,
-  Loader2,
 } from "lucide-react";
 
 interface BMWStatus {
@@ -40,11 +39,21 @@ const GATE_DISPLAY = [
   { type: "bmw_authorization", label: "BMW Authorization" },
 ];
 
-function gateStatusStyle(status: string) {
-  if (status === "approved") return { bg: "bg-emerald-50", border: "border-emerald-100", icon: CheckCircle2, iconColor: "text-emerald-500", label: "text-emerald-600", text: "Approved" };
-  if (status === "in_progress" || status === "submitted") return { bg: "bg-blue-50", border: "border-blue-100", icon: AlertTriangle, iconColor: "text-blue-500", label: "text-blue-600", text: "In Progress" };
-  if (status === "rejected" || status === "expired") return { bg: "bg-rose-50", border: "border-rose-100", icon: XCircle, iconColor: "text-rose-500", label: "text-rose-600", text: status };
-  return { bg: "bg-slate-50", border: "border-slate-100", icon: FileCheck, iconColor: "text-slate-400", label: "text-slate-400", text: "Not Started" };
+type GateStyle = {
+  dot: string;
+  text: string;
+  label: string;
+  icon: typeof CheckCircle2;
+};
+
+function gateStyle(status: string): GateStyle {
+  if (status === "approved")
+    return { dot: "bg-emerald-500", text: "text-emerald-700", label: "Approved", icon: CheckCircle2 };
+  if (status === "in_progress" || status === "submitted")
+    return { dot: "bg-blue-500",    text: "text-blue-700",    label: "In Progress", icon: AlertTriangle };
+  if (status === "rejected" || status === "expired")
+    return { dot: "bg-red-500",     text: "text-red-600",     label: status.charAt(0).toUpperCase() + status.slice(1), icon: XCircle };
+  return   { dot: "bg-gray-300",    text: "text-gray-400",    label: "Not Started", icon: FileCheck };
 }
 
 export function ComplianceHealthCard() {
@@ -61,74 +70,81 @@ export function ComplianceHealthCard() {
 
   if (loading) {
     return (
-      <div className="space-y-3 py-1">
+      <div className="space-y-2.5">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-12 bg-slate-100 rounded-xl animate-pulse" />
+          <div key={i} className="h-10 skeleton rounded-lg" />
         ))}
       </div>
     );
   }
 
-  // No gates initialized yet — show static fallback with link
   if (!data || !data.gates?.compliance?.length) {
     return (
-      <div className="space-y-3 py-1">
-        <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
-          <Loader2 size={14} className="text-slate-400" />
-          <p className="text-xs text-slate-500 font-medium">No compliance gates found. Initialize gates to see live status.</p>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2.5 rounded-lg border border-gray-100 bg-gray-50 p-3">
+          <ShieldCheck size={15} className="text-gray-300 shrink-0" />
+          <p className="text-xs text-gray-500">
+            No compliance gates initialized.
+          </p>
         </div>
         <Link
           href="/dashboard/compliance"
-          className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors mt-1"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
         >
-          Open Compliance Center <ArrowRight size={12} />
+          Initialize gates <ArrowRight size={11} />
         </Link>
       </div>
     );
   }
 
   const gates = data.gates.compliance;
+  const pct   = Math.round(data.overallCompletion);
 
   return (
-    <div className="space-y-3 py-1">
-      {/* Go-live badge */}
-      <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold ${
+    <div className="space-y-3">
+      {/* Overall status pill */}
+      <div className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold ${
         data.canGoLive
-          ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+          ? "bg-emerald-50 text-emerald-700"
           : data.criticalBlockers > 0
-            ? "bg-rose-50 border-rose-200 text-rose-700"
-            : "bg-amber-50 border-amber-200 text-amber-700"
+          ? "bg-red-50 text-red-700"
+          : "bg-amber-50 text-amber-700"
       }`}>
-        {data.canGoLive
-          ? <><CheckCircle2 size={13} /> Ready to Go Live — {Math.round(data.overallCompletion)}% complete</>
-          : <><AlertTriangle size={13} /> {data.criticalBlockers} blocker{data.criticalBlockers !== 1 ? "s" : ""} — {Math.round(data.overallCompletion)}% complete</>
-        }
+        <span className="flex items-center gap-1.5">
+          {data.canGoLive
+            ? <><CheckCircle2 size={12} /> Ready to Go Live</>
+            : <><AlertTriangle size={12} /> {data.criticalBlockers} blocker{data.criticalBlockers !== 1 ? "s" : ""}</>
+          }
+        </span>
+        <span className="font-bold">{pct}%</span>
       </div>
 
-      {/* Top 3 gate statuses */}
-      {GATE_DISPLAY.map(({ type, label }) => {
-        const gate = gates.find((g) => g.gateType === type);
-        const s = gateStatusStyle(gate?.status ?? "not_started");
-        const Icon = s.icon;
-        return (
-          <div
-            key={type}
-            className={`flex items-center justify-between p-3 ${s.bg} rounded-xl border ${s.border}`}
-          >
-            <div className="flex items-center gap-2">
-              <Icon size={16} className={s.iconColor} />
-              <span className="text-sm font-semibold text-slate-700">{label}</span>
+      {/* Gate list */}
+      <div className="space-y-1.5">
+        {GATE_DISPLAY.map(({ type, label }) => {
+          const gate = gates.find((g) => g.gateType === type);
+          const s = gateStyle(gate?.status ?? "not_started");
+          const Icon = s.icon;
+          return (
+            <div key={type} className="flex items-center justify-between py-1.5">
+              <div className="flex items-center gap-2.5">
+                <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${s.dot}`} />
+                <span className="text-sm text-gray-700 font-medium">{label}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Icon size={12} className={s.text} />
+                <span className={`text-xs font-semibold ${s.text}`}>{s.label}</span>
+              </div>
             </div>
-            <span className={`text-xs font-black uppercase tracking-wider ${s.label}`}>{s.text}</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
 
       <Link
         href="/dashboard/compliance"
-        className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors mt-1"
+        className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
       >
-        Manage Compliance <ArrowRight size={12} />
+        Manage compliance <ArrowRight size={11} />
       </Link>
     </div>
   );
