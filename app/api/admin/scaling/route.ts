@@ -6,7 +6,7 @@ import { SCALING_TARGETS, PERFORMANCE_THRESHOLDS } from "@/lib/jobs/compliance-m
 import { Organization } from "@/models/Organization";
 import { TenantBranding } from "@/models/TenantBranding";
 import { SampleOrder } from "@/models/SampleOrder";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {

@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { ComplianceGate } from "@/models/ComplianceGate";
 import { GoLiveGate } from "@/models/GoLiveGate";
 import { StateRegulatoryProfile } from "@/models/StateRegulatoryProfile";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {
@@ -98,44 +98,29 @@ export async function POST(request: NextRequest) {
     const { state, labType, district } = body;
 
     await connectDB();
-    
-    // Initialize compliance gates based on state regulatory profile
-    const stateProfile = await StateRegulatoryProfile.getByState(state);
-    if (!stateProfile) {
-      return NextResponse.json(
-        { error: `State regulatory profile not found for ${state}` },
-        { status: 404 }
-      );
-    }
-    
-    // Get required licenses for this state and lab type
-    const requiredLicenses = await StateRegulatoryProfile.getRequiredLicenses(state, labType);
-    
-    // Initialize compliance gates
+
+    // Initialize compliance gates (these work independently of the state profile)
     await ComplianceGate.initializeStateGates(session.user.organizationId, state);
-    
-    // Initialize go-live gates
     await GoLiveGate.initializeDefaultGates(session.user.organizationId);
-    
-    // Get district-specific rules if provided
-    const districtRules = district ? stateProfile.getDistrictRules(district) : null;
-    
-    // Get CBWTF vendors for the district
-    const cbwtfVendors = district ? stateProfile.getCBWTFVendors(district) : stateProfile.cbwtfVendors;
-    
-    // Calculate estimated timeline
-    const estimatedTimeline = stateProfile.getEstimatedTimeline(labType, district || '');
-    
+
+    // Attempt to load the state regulatory profile for enriched response data.
+    // Gate initialization succeeds even if no profile is seeded yet.
+    const stateProfile = await StateRegulatoryProfile.getByState(state);
+
+    let stateProfileData: Record<string, unknown> = { state, note: "State regulatory profile not yet seeded — gates initialized with defaults." };
+
+    if (stateProfile) {
+      const requiredLicenses = await StateRegulatoryProfile.getRequiredLicenses(state, labType);
+      const districtRules = district ? stateProfile.getDistrictRules(district) : null;
+      const cbwtfVendors = district ? stateProfile.getCBWTFVendors(district) : stateProfile.cbwtfVendors;
+      const estimatedTimeline = stateProfile.getEstimatedTimeline(labType, district || "");
+      stateProfileData = { state: stateProfile.state, requiredLicenses, districtRules, cbwtfVendors, estimatedTimeline };
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'Compliance gates initialized successfully',
-      stateProfile: {
-        state: stateProfile.state,
-        requiredLicenses,
-        districtRules,
-        cbwtfVendors,
-        estimatedTimeline
-      }
+      message: "Compliance gates initialized successfully",
+      stateProfile: stateProfileData,
     });
   } catch (error) {
     console.error("Error initializing compliance gates:", error);

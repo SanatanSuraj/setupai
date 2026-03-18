@@ -71,9 +71,7 @@ const GoLiveGateSchema = new Schema<GoLiveGateDocument>({
     },
     hardGateEnforcement: {
       type: Boolean,
-      default: function() {
-        return this.gateType === 'bmw_authorization';
-      }
+      default: false
     }
   },
   

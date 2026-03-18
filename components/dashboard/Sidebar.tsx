@@ -9,11 +9,12 @@ const nav = [
   { href: "/dashboard/guide", label: "Setup Guide" },
   { href: "/dashboard/roadmap", label: "Roadmap" },
   { href: "/dashboard/licensing", label: "Licensing" },
+  { href: "/dashboard/compliance", label: "Compliance" },
+  { href: "/dashboard/documents", label: "Documents" },
   { href: "/dashboard/equipment", label: "Equipment" },
   { href: "/dashboard/staff", label: "Staffing & HR" },
   { href: "/dashboard/nabl", label: "NABL Accreditation" },
   { href: "/dashboard/operations", label: "Operations" },
-
 ];
 
 export function Sidebar() {

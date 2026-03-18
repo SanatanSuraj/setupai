@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { ComplianceGate } from "@/models/ComplianceGate";
+import { GoLiveGate } from "@/models/GoLiveGate";
 import { StateRegulatoryProfile } from "@/models/StateRegulatoryProfile";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {
@@ -80,31 +81,47 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { gateType, status, documents, applicationDetails } = body;
+    const { gateType, status, documents, applicationDetails, gateCategory } = body;
 
     await connectDB();
 
+    // Route to GoLiveGate when gateCategory === "golive"
+    if (gateCategory === "golive") {
+      const gate = await GoLiveGate.findOneAndUpdate(
+        { organizationId: session.user.organizationId, gateType },
+        {
+          $set: {
+            status,
+            ...(documents && { documents }),
+            updatedAt: new Date(),
+          },
+        },
+        { new: true }
+      );
+
+      if (!gate) {
+        return NextResponse.json({ error: "Go-live gate not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(gate);
+    }
+
+    // Default: ComplianceGate
     const gate = await ComplianceGate.findOneAndUpdate(
-      { 
-        organizationId: session.user.organizationId, 
-        gateType 
-      },
+      { organizationId: session.user.organizationId, gateType },
       {
         $set: {
           status,
           ...(documents && { documents }),
           ...(applicationDetails && { applicationDetails }),
-          lastUpdated: new Date()
-        }
+          lastUpdated: new Date(),
+        },
       },
       { new: true }
     );
 
     if (!gate) {
-      return NextResponse.json(
-        { error: "Compliance gate not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Compliance gate not found" }, { status: 404 });
     }
 
     return NextResponse.json(gate);

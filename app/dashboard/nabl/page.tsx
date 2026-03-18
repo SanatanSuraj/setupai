@@ -6,7 +6,7 @@ import { Badge } from "@/components/dashboard/Badge";
 import {
   FileText, CheckCircle, AlertTriangle, Clock, BookOpen, Target,
   Award, Calendar, TrendingUp, AlertCircle, Plus, Pencil, Save,
-  X, Trash2, ChevronDown, ChevronRight,
+  X, Trash2, ChevronDown, ChevronRight, ArrowRight,
 } from "lucide-react";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -19,7 +19,6 @@ type Tab = "overview" | "documents" | "tests" | "timeline";
 interface QualitySection { name: string; status: SectionStatus; lastUpdated?: string; }
 interface ProficiencyTest { testName: string; provider: string; dueDate: string; status: PTStatus; score?: number; }
 interface AuditEntry { type: string; date: string; auditor: string; status: AuditStatus; }
-interface NablReqCategory { category: string; completed: number; total: number; }
 interface DocumentControl { totalDocuments: number; controlledDocuments: number; pendingReview: number; overdueDocs: number; }
 
 // ─── Document Checklist Data ────────────────────────────────────────────────────
@@ -271,6 +270,35 @@ const DOCUMENT_SECTIONS = [
   },
 ];
 
+// ISO 15189:2022 clause → document section mapping
+// Each category auto-computes progress from the checklist checkboxes
+const ISO_REQUIREMENT_MAP: { category: string; sectionIds: string[] }[] = [
+  {
+    category: "General Requirements",
+    sectionIds: ["A", "J", "K"],
+  },
+  {
+    category: "Structural Requirements",
+    sectionIds: ["C"],
+  },
+  {
+    category: "Resource Requirements",
+    sectionIds: ["D", "F"],
+  },
+  {
+    category: "Process Requirements",
+    sectionIds: ["E", "G"],
+  },
+  {
+    category: "Management System",
+    sectionIds: ["B", "H"],
+  },
+  {
+    category: "Improvement Requirements",
+    sectionIds: ["I", "L", "M"],
+  },
+];
+
 const TIMELINE_PHASES = [
   {
     phase: "Preparation Phase", duration: "6–9 months", color: "blue",
@@ -307,14 +335,6 @@ const DEFAULT_SECTIONS: QualitySection[] = [
 ];
 const DEFAULT_PT: ProficiencyTest[] = [];
 const DEFAULT_AUDITS: AuditEntry[] = [];
-const DEFAULT_REQUIREMENTS: NablReqCategory[] = [
-  { category: "General Requirements", completed: 0, total: 10 },
-  { category: "Structural Requirements", completed: 0, total: 8 },
-  { category: "Resource Requirements", completed: 0, total: 15 },
-  { category: "Process Requirements", completed: 0, total: 25 },
-  { category: "Management System", completed: 0, total: 12 },
-  { category: "Improvement Requirements", completed: 0, total: 6 },
-];
 
 const SECTION_STATUS_OPTIONS: SectionStatus[] = ["pending", "in_progress", "completed"];
 const PT_STATUS_OPTIONS: PTStatus[] = ["pending", "enrolled", "completed", "overdue"];
@@ -335,7 +355,6 @@ export default function NABLPage() {
   const [sections, setSections] = useState<QualitySection[]>(DEFAULT_SECTIONS);
   const [proficiencyTests, setProficiencyTests] = useState<ProficiencyTest[]>(DEFAULT_PT);
   const [audits, setAudits] = useState<AuditEntry[]>(DEFAULT_AUDITS);
-  const [requirements, setRequirements] = useState<NablReqCategory[]>(DEFAULT_REQUIREMENTS);
   const [docControl, setDocControl] = useState<DocumentControl>({ totalDocuments: 0, controlledDocuments: 0, pendingReview: 0, overdueDocs: 0 });
 
   // doc checklist
@@ -363,9 +382,6 @@ export default function NABLPage() {
   const [editingDocControl, setEditingDocControl] = useState(false);
   const [docDraft, setDocDraft] = useState<DocumentControl>(docControl);
 
-  // Req editing
-  const [editingReqIdx, setEditingReqIdx] = useState<number | null>(null);
-  const [reqDraft, setReqDraft] = useState<Partial<NablReqCategory>>({});
 
   // load
   useEffect(() => {
@@ -379,8 +395,6 @@ export default function NABLPage() {
           setProficiencyTests(data.proficiencyTests);
         if (Array.isArray(data.auditSchedule))
           setAudits(data.auditSchedule);
-        if (Array.isArray(data.nablRequirements) && data.nablRequirements.length > 0)
-          setRequirements(data.nablRequirements);
         if (data.documentControl)
           setDocControl(data.documentControl);
       })
@@ -569,35 +583,81 @@ export default function NABLPage() {
             </Card>
           </div>
 
-          {/* Requirements Checklist */}
-          <Card title="NABL ISO 15189:2022 Requirements" subtitle="Click the pencil to update completed count" icon={CheckCircle}>
+          {/* Requirements Checklist — auto-computed from document checklist */}
+          <Card
+            title="NABL ISO 15189:2022 Requirements"
+            subtitle="Live progress from your document checklist"
+            icon={CheckCircle}
+            action={
+              <button
+                onClick={() => setTab("documents")}
+                className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                View Checklist <ArrowRight size={12} />
+              </button>
+            }
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {requirements.map((req, idx) => {
-                const isEditing = editingReqIdx === idx;
-                const pct = Math.round((req.completed / req.total) * 100);
-                const color = pct >= 80 ? "emerald" : pct >= 60 ? "amber" : "rose";
+              {ISO_REQUIREMENT_MAP.map((req) => {
+                const relatedSections = req.sectionIds
+                  .map((id) => DOCUMENT_SECTIONS.find((s) => s.id === id)!)
+                  .filter(Boolean);
+                const total = relatedSections.reduce((acc, s) => acc + s.items.length, 0);
+                const completed = relatedSections.reduce(
+                  (acc, s) =>
+                    acc + s.items.filter((_, i) => checkedItems[`${s.id}-${i}`]).length,
+                  0
+                );
+                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                const color = pct >= 80 ? "emerald" : pct >= 40 ? "amber" : "rose";
+                const statusIcon =
+                  pct >= 80 ? (
+                    <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                  ) : pct >= 40 ? (
+                    <Clock size={14} className="text-amber-500 shrink-0" />
+                  ) : (
+                    <AlertCircle size={14} className="text-rose-400 shrink-0" />
+                  );
+
                 return (
-                  <div key={idx} className="p-4 border border-slate-200 rounded-xl group hover:border-blue-200">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-slate-800 text-sm">{req.category}</h3>
-                      {isEditing ? (
-                        <div className="flex items-center gap-1">
-                          <input type="number" value={reqDraft.completed ?? req.completed} min={0} max={req.total} onChange={(e) => setReqDraft((d) => ({ ...d, completed: Number(e.target.value) }))} className="w-12 rounded border border-slate-200 px-1.5 py-0.5 text-xs text-center" />
-                          <span className="text-xs text-slate-400">/{req.total}</span>
-                          <button onClick={() => { setRequirements(requirements.map((r, i) => i === idx ? { ...r, completed: Math.min(r.total, Math.max(0, Number(reqDraft.completed ?? r.completed))) } : r)); setEditingReqIdx(null); }} className="p-1 rounded bg-blue-600 text-white"><Save size={12} /></button>
-                          <button onClick={() => setEditingReqIdx(null)} className="p-1 rounded border border-slate-200 text-slate-500"><X size={12} /></button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1">
-                          <Badge variant={color === "emerald" ? "success" : color === "amber" ? "warning" : "danger"}>{req.completed}/{req.total}</Badge>
-                          <button onClick={() => { setEditingReqIdx(idx); setReqDraft({ completed: req.completed }); }} className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-100 text-slate-500"><Pencil size={12} /></button>
-                        </div>
-                      )}
+                  <div
+                    key={req.category}
+                    className="p-4 border border-slate-200 rounded-xl hover:border-blue-200 transition-colors cursor-pointer"
+                    onClick={() => setTab("documents")}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-start gap-2 min-w-0">
+                        <span className="mt-0.5 shrink-0">{statusIcon}</span>
+                        <h3 className="font-bold text-slate-800 text-sm leading-tight">{req.category}</h3>
+                      </div>
+                      <Badge variant={color === "emerald" ? "success" : color === "amber" ? "warning" : "danger"}>
+                        {completed}/{total}
+                      </Badge>
                     </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
-                      <div className={`h-2 rounded-full bg-${color}-500 transition-all`} style={{ width: `${pct}%` }} />
+
+                    {/* Section tags */}
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {relatedSections.map((s) => (
+                        <span
+                          key={s.id}
+                          title={s.title}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold"
+                        >
+                          <span className="w-4 h-4 rounded bg-slate-800 text-white flex items-center justify-center text-[9px] font-black shrink-0">
+                            {s.id}
+                          </span>
+                          <span className="truncate max-w-[80px]">{s.title.split(" ").slice(0, 2).join(" ")}</span>
+                        </span>
+                      ))}
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{pct}% complete</p>
+
+                    <div className="w-full bg-slate-100 rounded-full h-2 mb-1">
+                      <div
+                        className={`h-2 rounded-full bg-${color}-500 transition-all`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-400">{pct}% complete</p>
                   </div>
                 );
               })}

@@ -5,12 +5,24 @@ import { Card } from "@/components/dashboard/Card";
 import { Badge } from "@/components/dashboard/Badge";
 import { Download, Plus, Package, Microscope, Users, Cpu, Layers, ShieldCheck, Wrench, Zap } from "lucide-react";
 
+type EquipmentStatus = "planning" | "ordered" | "delivered" | "installed" | "integrated";
+
+const STATUS_STEPS: EquipmentStatus[] = ["planning", "ordered", "delivered", "installed", "integrated"];
+const STATUS_COLORS: Record<EquipmentStatus, string> = {
+  planning:   "bg-slate-100 text-slate-600",
+  ordered:    "bg-blue-100 text-blue-700",
+  delivered:  "bg-amber-100 text-amber-700",
+  installed:  "bg-violet-100 text-violet-700",
+  integrated: "bg-emerald-100 text-emerald-700",
+};
+
 interface EquipmentItem {
   _id: string;
   name: string;
   category: string;
   capex: number;
   maintenanceCost?: number;
+  status?: EquipmentStatus;
 }
 
 interface Recommendation {
@@ -93,6 +105,23 @@ export default function EquipmentPage() {
       setRecommendations(data);
       setShowRecommend(true);
     }
+  };
+
+  const updateEquipmentStatus = async (id: string, status: EquipmentStatus) => {
+    const res = await fetch(`/api/equipment/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setEquipment((prev) => prev.map((e) => (e._id === id ? { ...e, ...updated } : e)));
+    }
+  };
+
+  const deleteEquipment = async (id: string) => {
+    const res = await fetch(`/api/equipment/${id}`, { method: "DELETE" });
+    if (res.ok) setEquipment((prev) => prev.filter((e) => e._id !== id));
   };
 
   const addEquipment = async (rec: Recommendation) => {
@@ -216,20 +245,71 @@ export default function EquipmentPage() {
           </div>
         </Card>
       )}
-            <Card title="Your equipment list">
-        <p className="text-sm text-muted-foreground">Total CAPEX: ₹{totalCapex.toLocaleString()}</p>
-        <ul className="mt-4 space-y-2">
-          {equipment.length === 0 && <p className="text-muted-foreground">No equipment added yet.</p>}
-          {equipment.map((e) => (
-            <li key={e._id} className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
-              <div>
-                <span className="font-medium text-foreground">{e.name}</span>
-                <span className="ml-2 text-sm text-muted-foreground">{e.category}</span>
-              </div>
-              <span className="font-medium text-foreground">₹{e.capex.toLocaleString()}</span>
-            </li>
-          ))}
-        </ul>
+            <Card title="Your Equipment List" subtitle="Track procurement lifecycle per item">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Total CAPEX: <span className="font-bold text-slate-800">₹{totalCapex.toLocaleString()}</span></p>
+          <p className="text-xs text-slate-400">{equipment.length} item{equipment.length !== 1 ? "s" : ""}</p>
+        </div>
+        {equipment.length === 0 ? (
+          <p className="text-muted-foreground text-sm py-4 text-center">No equipment added yet. Use AI recommendations above to add items.</p>
+        ) : (
+          <div className="space-y-3">
+            {equipment.map((e) => {
+              const currentStatus = (e.status ?? "planning") as EquipmentStatus;
+              const currentIdx = STATUS_STEPS.indexOf(currentStatus);
+              return (
+                <div key={e._id} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-bold text-slate-800 text-sm truncate">{e.name}</p>
+                      <p className="text-xs text-slate-500">{e.category} · ₹{e.capex.toLocaleString()}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`px-2 py-0.5 rounded-lg text-xs font-bold capitalize ${STATUS_COLORS[currentStatus]}`}>
+                        {currentStatus}
+                      </span>
+                      <button
+                        onClick={() => deleteEquipment(e._id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                        title="Remove"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  {/* Status stepper */}
+                  <div className="flex items-center gap-1">
+                    {STATUS_STEPS.map((step, idx) => {
+                      const isPast = idx < currentIdx;
+                      const isCurrent = idx === currentIdx;
+                      const isNext = idx === currentIdx + 1;
+                      return (
+                        <button
+                          key={step}
+                          onClick={() => isNext ? updateEquipmentStatus(e._id, step) : undefined}
+                          disabled={!isNext}
+                          title={isNext ? `Advance to "${step}"` : step}
+                          className={`flex-1 h-1.5 rounded-full transition-all ${
+                            isPast || isCurrent
+                              ? "bg-blue-500"
+                              : isNext
+                                ? "bg-slate-200 hover:bg-blue-300 cursor-pointer"
+                                : "bg-slate-100 cursor-default"
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                    {STATUS_STEPS.map((step) => (
+                      <span key={step} className={`capitalize ${step === currentStatus ? "text-blue-600 font-bold" : ""}`}>{step}</span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

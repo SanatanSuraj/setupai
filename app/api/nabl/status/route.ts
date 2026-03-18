@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { GoLiveGate } from "@/models/GoLiveGate";
 import { ComplianceGate } from "@/models/ComplianceGate";
 import { Organization } from "@/models/Organization";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {

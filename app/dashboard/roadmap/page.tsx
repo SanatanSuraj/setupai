@@ -136,21 +136,35 @@ export default function RoadmapPage() {
 
   const generateRoadmap = async () => {
     setLoading(true);
-    const res = await fetch("/api/roadmap", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        labType,
-        state,
-        district,
-        city,
-        budget: parseInt(budget, 10) || undefined,
-      }),
-    });
-    const data = await res.json();
-    if (res.ok) setRoadmap(data);
-    setLoading(false);
-    setOnboarding(false);
+    try {
+      // 1. Register with backend (mock, acts as a flag that roadmap exists)
+      const res = await fetch("/api/roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ labType, state, district, city, budget: parseInt(budget, 10) || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok) setRoadmap(data);
+
+      // 2. Fire AI roadmap generation in background (non-blocking)
+      fetch("/api/ai/roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ labType, state, district, city, budget: parseInt(budget, 10) || 1000000 }),
+      }).catch(() => {});
+
+      // 3. Initialize compliance gates for the chosen state + lab type
+      fetch("/api/compliance/readiness", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ state, labType, district: district || undefined }),
+      }).catch(() => {});
+    } catch {
+      // silently continue with static phases
+    } finally {
+      setLoading(false);
+      setOnboarding(false);
+    }
   };
 
   const togglePhaseTask = (phaseIdx: number, taskIdx: number) => {

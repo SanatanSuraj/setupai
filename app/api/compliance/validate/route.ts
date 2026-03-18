@@ -5,7 +5,7 @@ import { complianceEngine } from "@/lib/compliance-engine";
 import { Organization } from "@/models/Organization";
 import { Staff } from "@/models/Staff";
 import { Equipment } from "@/models/Equipment";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function POST(request: NextRequest) {
   try {

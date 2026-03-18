@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { aiOrchestrator } from "@/lib/ai-orchestrator";
 import { Organization } from "@/models/Organization";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function POST(request: NextRequest) {
   try {

@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { TenantBranding } from "@/models/TenantBranding";
 import { Organization } from "@/models/Organization";
 import { tenantResolver } from "@/lib/middleware/tenant-resolver";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {

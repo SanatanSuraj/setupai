@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth-options";
 import { Card } from "@/components/dashboard/Card";
 import { ActiveTasks } from "@/components/dashboard/ActiveTasks";
 import { SetupProgress } from "@/components/dashboard/SetupProgress";
+import { ComplianceHealthCard } from "@/components/dashboard/ComplianceHealthCard";
+import { AIInsightsCard } from "@/components/dashboard/AIInsightsCard";
 import {
   Map,
   ShieldCheck,
@@ -13,10 +15,9 @@ import {
   Users,
   Award,
   Activity,
-  TrendingUp,
-  AlertTriangle,
   Layers,
   ArrowRight,
+  FileText,
 } from "lucide-react";
 
 const modules = [
@@ -63,6 +64,20 @@ const modules = [
     color: "amber",
   },
   {
+    href: "/dashboard/compliance",
+    label: "Compliance Center",
+    description: "BMW authorization, go-live gates, and full regulatory validation.",
+    icon: ShieldCheck,
+    color: "teal",
+  },
+  {
+    href: "/dashboard/documents",
+    label: "Documents",
+    description: "Generate CEA, BMW, and Quality Manual documents. AI doc validation.",
+    icon: FileText,
+    color: "orange",
+  },
+  {
     href: "/dashboard/operations",
     label: "Operations",
     description: "Live sample tracking, TAT compliance, and BMW waste records.",
@@ -79,6 +94,8 @@ const colorMap: Record<string, { bg: string; icon: string; border: string; label
   emerald:{ bg: "bg-emerald-50",icon: "text-emerald-600",border: "border-emerald-100",label: "text-emerald-600" },
   amber:  { bg: "bg-amber-50",  icon: "text-amber-600",  border: "border-amber-100",  label: "text-amber-600" },
   rose:   { bg: "bg-rose-50",   icon: "text-rose-600",   border: "border-rose-100",   label: "text-rose-600" },
+  teal:   { bg: "bg-teal-50",   icon: "text-teal-600",   border: "border-teal-100",   label: "text-teal-600" },
+  orange: { bg: "bg-orange-50", icon: "text-orange-600", border: "border-orange-100", label: "text-orange-600" },
 };
 
 export default async function DashboardPage() {
@@ -129,33 +146,8 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        <Card title="Compliance Health" subtitle="License & Regulatory Status" className="md:col-span-1">
-          <div className="space-y-3 py-1">
-            <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-emerald-600" />
-                <span className="text-sm font-semibold text-slate-700">CEA Application</span>
-              </div>
-              <span className="text-xs font-black text-emerald-600 uppercase tracking-wider">Applied</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
-              <div className="flex items-center gap-2">
-                <AlertTriangle size={16} className="text-amber-500" />
-                <span className="text-sm font-semibold text-slate-700">Fire Safety NOC</span>
-              </div>
-              <span className="text-xs font-black text-amber-600 uppercase tracking-wider">Pending</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center gap-2">
-                <FileCheck size={16} className="text-slate-400" />
-                <span className="text-sm font-semibold text-slate-700">BMW Authorization</span>
-              </div>
-              <span className="text-xs font-black text-slate-400 uppercase tracking-wider">Not Started</span>
-            </div>
-            <Link href="/dashboard/licensing" className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors mt-1">
-              Manage Licenses <ArrowRight size={12} />
-            </Link>
-          </div>
+        <Card title="Compliance Health" subtitle="Live Gate Status" className="md:col-span-1">
+          <ComplianceHealthCard />
         </Card>
       </div>
 
@@ -166,49 +158,7 @@ export default async function DashboardPage() {
         </Card>
 
         <Card title="SetupAI Insights" icon={Layers}>
-          <div className="space-y-3">
-            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 relative overflow-hidden group">
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-1.5 text-blue-700">
-                  <TrendingUp size={15} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Equipment Tip</span>
-                </div>
-                <p className="text-sm text-blue-800 font-semibold leading-relaxed">
-                  A 5-part Hematology Analyzer covers 80% of test demand for a mid-size lab. Consider shared CAPEX with a nearby collection center.
-                </p>
-              </div>
-              <div className="absolute right-2 top-2 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Wrench size={56} />
-              </div>
-            </div>
-
-            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 relative group overflow-hidden">
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-1.5 text-amber-700">
-                  <Award size={15} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">NABL Alert</span>
-                </div>
-                <p className="text-sm text-amber-800 font-semibold leading-relaxed">
-                  Quality Policy and Internal Audit Schedule must be finalised at least 6 months before applying for NABL assessment.
-                </p>
-              </div>
-              <div className="absolute right-2 top-2 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Award size={56} />
-              </div>
-            </div>
-
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 relative group overflow-hidden">
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-1.5 text-emerald-700">
-                  <Users size={15} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Staffing Reminder</span>
-                </div>
-                <p className="text-sm text-emerald-800 font-semibold leading-relaxed">
-                  An MD Pathologist must be on-roll before you can apply for NABL or Clinical Establishment registration in most states.
-                </p>
-              </div>
-            </div>
-          </div>
+          <AIInsightsCard />
         </Card>
       </div>
 
