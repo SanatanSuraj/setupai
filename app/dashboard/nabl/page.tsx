@@ -271,31 +271,52 @@ const DOCUMENT_SECTIONS = [
 ];
 
 // ISO 15189:2022 clause → document section mapping
-// Each category auto-computes progress from the checklist checkboxes
-const ISO_REQUIREMENT_MAP: { category: string; sectionIds: string[] }[] = [
+// Aligned with the exact clause structure of ISO 15189:2022:
+//   Clause 4  — General Requirements (impartiality, confidentiality)
+//   Clause 5  — Structural Requirements (legal entity, organisation, roles)
+//   Clause 6  — Resource Requirements (personnel, facilities, equipment)
+//   Clause 7  — Process Requirements (all examination processes, data mgmt, complaints §7.9, LIS §7.11)
+//   Clause 8  — Management System Requirements (documentation, audits §8.8, management review §8.9)
+//   (extra)   — Improvement / Accreditation (ongoing compliance, quality indicators, NABL assessment prep)
+const ISO_REQUIREMENT_MAP: { category: string; clause: string; description: string; sectionIds: string[] }[] = [
   {
     category: "General Requirements",
-    sectionIds: ["A", "J", "K"],
+    clause: "Clause 4",
+    description: "Impartiality & confidentiality",
+    sectionIds: ["A"],
   },
   {
     category: "Structural Requirements",
+    clause: "Clause 5",
+    description: "Organisation, roles & authorities",
     sectionIds: ["C"],
   },
   {
     category: "Resource Requirements",
+    clause: "Clause 6",
+    description: "Facilities, equipment & reagents",
     sectionIds: ["D", "F"],
   },
   {
+    // Clause 7.6 QA of results (E), Clause 7.11 LIS/data mgmt (G), Clause 7.9 Complaints (I)
     category: "Process Requirements",
-    sectionIds: ["E", "G"],
+    clause: "Clause 7",
+    description: "Examination, QA, LIS & complaints",
+    sectionIds: ["E", "G", "I"],
   },
   {
+    // Clause 8.2–8.4 documentation (B), Clause 8.8 internal audits, Clause 8.9 management review (H)
     category: "Management System",
+    clause: "Clause 8",
+    description: "QMS documentation, audits & review",
     sectionIds: ["B", "H"],
   },
   {
+    // Clause 8.6 continual improvement + NABL-specific assessment & ongoing compliance docs
     category: "Improvement Requirements",
-    sectionIds: ["I", "L", "M"],
+    clause: "Clause 8.6–8.7",
+    description: "Continual improvement & accreditation",
+    sectionIds: ["J", "K", "L", "M"],
   },
 ];
 
@@ -323,15 +344,22 @@ const TIMELINE_PHASES = [
 ];
 
 // ─── Static defaults ────────────────────────────────────────────────────────────
+// Default Quality Manual sections aligned to ISO 15189:2022 clause structure.
+// Loaded from API on mount; these are used only for first-time / empty state.
 const DEFAULT_SECTIONS: QualitySection[] = [
-  { name: "Quality Policy & Objectives", status: "pending" },
-  { name: "Document Control", status: "pending" },
-  { name: "Management Responsibility", status: "pending" },
-  { name: "Resource Management", status: "pending" },
-  { name: "Pre-examination Processes", status: "pending" },
-  { name: "Examination Processes", status: "pending" },
-  { name: "Post-examination Processes", status: "pending" },
-  { name: "Management System Improvement", status: "pending" },
+  { name: "Impartiality & Confidentiality",        status: "pending" }, // Clause 4
+  { name: "Organizational Structure & Roles",       status: "pending" }, // Clause 5
+  { name: "Personnel Resources & Competency",       status: "pending" }, // Clause 6.2
+  { name: "Facilities & Environmental Conditions",  status: "pending" }, // Clause 6.3
+  { name: "Equipment & Metrological Traceability",  status: "pending" }, // Clauses 6.4–6.5
+  { name: "Pre-Examination Processes",              status: "pending" }, // Clause 7.4
+  { name: "Examination Processes",                  status: "pending" }, // Clause 7.5
+  { name: "Quality Assurance of Results",           status: "pending" }, // Clause 7.6
+  { name: "Post-Examination & Reporting",           status: "pending" }, // Clauses 7.7–7.8
+  { name: "Nonconformities & Corrective Actions",   status: "pending" }, // Clause 8.7
+  { name: "Internal Audits",                        status: "pending" }, // Clause 8.8
+  { name: "Management Review",                      status: "pending" }, // Clause 8.9
+  { name: "Continual Improvement",                  status: "pending" }, // Clause 8.6
 ];
 const DEFAULT_PT: ProficiencyTest[] = [];
 const DEFAULT_AUDITS: AuditEntry[] = [];
@@ -622,10 +650,11 @@ export default function NABLPage() {
                 return (
                   <div
                     key={req.category}
-                    className="p-4 border border-slate-200 rounded-xl hover:border-blue-200 transition-colors cursor-pointer"
+                    className="p-4 border border-slate-200 rounded-xl hover:border-blue-200 transition-colors cursor-pointer group"
                     onClick={() => setTab("documents")}
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    {/* Header: status icon + category name + count badge */}
+                    <div className="flex items-start justify-between mb-1">
                       <div className="flex items-start gap-2 min-w-0">
                         <span className="mt-0.5 shrink-0">{statusIcon}</span>
                         <h3 className="font-bold text-slate-800 text-sm leading-tight">{req.category}</h3>
@@ -635,7 +664,12 @@ export default function NABLPage() {
                       </Badge>
                     </div>
 
-                    {/* Section tags */}
+                    {/* ISO clause number + description */}
+                    <p className="text-[10px] font-bold text-blue-500 ml-6 mb-2 tracking-wide uppercase">
+                      {req.clause} · {req.description}
+                    </p>
+
+                    {/* Document section tags */}
                     <div className="flex flex-wrap gap-1 mb-3">
                       {relatedSections.map((s) => (
                         <span
