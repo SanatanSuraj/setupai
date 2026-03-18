@@ -252,15 +252,30 @@ export default function LandingPage() {
 
                         {/* Step 4 */}
                         <div className="flex flex-col md:flex-row items-center justify-between w-full group">
+                            <div className="md:w-5/12 w-full hidden md:block"></div>
+                            {/* Desktop Node */}
+                            <div className="hidden md:flex w-2/12 justify-center relative">
+                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-purple-500 flex items-center justify-center z-10 text-xl font-black text-purple-400">4</div>
+                            </div>
+                            <div className="md:w-5/12 text-left md:pl-8 mb-6 md:mb-0 w-full pl-12 md:pl-0 relative">
+                                 {/* Mobile Node */}
+                                 <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-purple-500 flex items-center justify-center font-bold text-purple-400 text-sm">4</div>
+                                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition">Quality Control & SOPs</h3>
+                                <p className="text-slate-400 text-sm leading-relaxed">Access pre-built Standard Operating Procedure (SOP) templates. Set up your internal QC values and prepare for NABL audits from day one.</p>
+                            </div>
+                        </div>
+
+                        {/* Step 5 */}
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full group">
                             <div className="md:w-5/12 text-left md:text-right md:pr-8 mb-6 md:mb-0 w-full pl-12 md:pl-0 relative">
                                 {/* Mobile Node */}
-                                <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-pink-500 flex items-center justify-center font-bold text-pink-400 text-sm">4</div>
+                                <div className="md:hidden absolute left-0 top-1 w-8 h-8 rounded-full bg-slate-800 border-2 border-pink-500 flex items-center justify-center font-bold text-pink-400 text-sm">5</div>
                                 <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-pink-400 transition">Launch & Operations</h3>
                                 <p className="text-slate-400 text-sm leading-relaxed">Hire Pathologists and Technicians using our salary benchmarks. Integrate your LIS/Billing software, run trial samples, and open your doors to patients.</p>
                             </div>
                             {/* Desktop Node */}
                             <div className="hidden md:flex w-2/12 justify-center relative">
-                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-pink-500 flex items-center justify-center z-10 text-xl font-black text-pink-400">4</div>
+                                <div className="w-12 h-12 rounded-full bg-slate-900 border-4 border-pink-500 flex items-center justify-center z-10 text-xl font-black text-pink-400">5</div>
                             </div>
                             <div className="md:w-5/12 w-full hidden md:block"></div>
                         </div>

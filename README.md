@@ -99,7 +99,7 @@ Middleware redirects to `/dashboard?upgrade=pro` or `?upgrade=enterprise` when a
 ## Architecture
 
 - **Multi-tenant**: Each user belongs to an **Organization**. All data is scoped by `organizationId`.
-- **Roles**: Admin, Compliance Manager, Lab Manager, Viewer (RBAC in `lib/rbac.ts`).
+- **Roles**: Admin, Compliance Manager, Lab Manager, Viewer.
 - **AI placeholder**: `lib/ai.ts` – `generateRoadmap()`, `documentGapAnalysis()`, `estimateLicenseApprovalTime()`, `recommendEquipment()` return mocked structured data; replace with real AI/LLM later.
 
 ## Scripts
