@@ -91,7 +91,6 @@ export default function RoadmapPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [roadmap, setRoadmap] = useState<RoadmapData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [onboarding, setOnboarding] = useState(false);
   const [labType, setLabType] = useState("basic");
   const [state, setState] = useState("Maharashtra");
   const [district, setDistrict] = useState("Mumbai Suburban");
@@ -99,13 +98,17 @@ export default function RoadmapPage() {
   const [budget, setBudget] = useState("1000000");
 
   const ROADMAP_STORAGE_KEY = "roadmap_phases_v3";
+  const ROADMAP_GENERATED_KEY = "roadmap_generated";
+
+  // true once the roadmap has ever been generated (persisted across refreshes)
+  const [roadmapGenerated, setRoadmapGenerated] = useState(false);
 
   useEffect(() => {
+    // Restore phase progress
     const saved = localStorage.getItem(ROADMAP_STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Only restore if structure matches (same count + correct phase numbering 1-5)
         const valid =
           Array.isArray(parsed) &&
           parsed.length === STATIC_PHASES.length &&
@@ -114,6 +117,22 @@ export default function RoadmapPage() {
       } catch (e) {
         console.error("Failed to parse phases", e);
       }
+    }
+    // Restore generated flag
+    if (localStorage.getItem(ROADMAP_GENERATED_KEY) === "1") {
+      setRoadmapGenerated(true);
+    }
+    // Restore last-used form values
+    const saved_meta = localStorage.getItem("roadmap_meta");
+    if (saved_meta) {
+      try {
+        const m = JSON.parse(saved_meta);
+        if (m.labType) setLabType(m.labType);
+        if (m.state) setState(m.state);
+        if (m.district) setDistrict(m.district);
+        if (m.city) setCity(m.city);
+        if (m.budget) setBudget(m.budget);
+      } catch { /* ignore */ }
     }
     setIsLoaded(true);
   }, []);
@@ -159,11 +178,18 @@ export default function RoadmapPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ state, labType, district: district || undefined }),
       }).catch(() => {});
+
+      // 4. Persist generated flag + form values so the form never re-appears
+      localStorage.setItem(ROADMAP_GENERATED_KEY, "1");
+      localStorage.setItem("roadmap_meta", JSON.stringify({ labType, state, district, city, budget }));
+      setRoadmapGenerated(true);
     } catch {
-      // silently continue with static phases
+      // silently continue with static phases — but still mark as generated
+      localStorage.setItem(ROADMAP_GENERATED_KEY, "1");
+      localStorage.setItem("roadmap_meta", JSON.stringify({ labType, state, district, city, budget }));
+      setRoadmapGenerated(true);
     } finally {
       setLoading(false);
-      setOnboarding(false);
     }
   };
 
@@ -189,7 +215,7 @@ export default function RoadmapPage() {
     );
   }
 
-  if (!roadmap && !onboarding) {
+  if (!roadmap && !roadmapGenerated) {
     return (
       <div className="p-6 md:p-8">
         <h1 className="text-2xl font-bold text-foreground">Setup Roadmap</h1>

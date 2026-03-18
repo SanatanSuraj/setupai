@@ -2,10 +2,8 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth-options";
 import { Card } from "@/components/dashboard/Card";
-import { ActiveTasks } from "@/components/dashboard/ActiveTasks";
 import { SetupProgress } from "@/components/dashboard/SetupProgress";
 import { ComplianceHealthCard } from "@/components/dashboard/ComplianceHealthCard";
-import { AIInsightsCard } from "@/components/dashboard/AIInsightsCard";
 import {
   Map,
   ShieldCheck,
@@ -15,7 +13,6 @@ import {
   Users,
   Award,
   Activity,
-  Layers,
   ArrowRight,
   FileText,
 } from "lucide-react";
@@ -151,21 +148,10 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* Active tasks + AI insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="Active Tasks" icon={Map}>
-          <ActiveTasks />
-        </Card>
-
-        <Card title="SetupAI Insights" icon={Layers}>
-          <AIInsightsCard />
-        </Card>
-      </div>
-
       {/* Module grid */}
       <div>
         <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">All Modules</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {modules.map((mod) => {
             const c = colorMap[mod.color];
             const Icon = mod.icon;
