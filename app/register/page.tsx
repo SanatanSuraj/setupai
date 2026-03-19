@@ -31,10 +31,19 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      // TODO: Create an API endpoint (e.g. /api/register) to save the user securely to your DB
-      // await fetch('/api/register', { method: 'POST', body: JSON.stringify({ name, email, password }) });
+      const regRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-      // Sign in the user automatically after successful creation
+      const data = await regRes.json();
+      if (!regRes.ok) {
+        setError(typeof data.error === "string" ? data.error : "Registration failed. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
       const res = await signIn("credentials", {
         email,
         password,
@@ -42,7 +51,7 @@ export default function RegisterPage() {
       });
 
       if (res?.error) {
-        setError("Failed to create account. Please try again.");
+        setError("Account created but sign-in failed. Please log in.");
         setIsLoading(false);
       } else {
         router.push("/dashboard/equipment");
