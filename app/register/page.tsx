@@ -1,253 +1,149 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Microscope, Shield, TrendingUp, Award, Eye, EyeOff } from "lucide-react";
-
-const FEATURES = [
-  { icon: Shield,     label: "Compliance Tracking",   desc: "BMW, CEA, NABL all in one place" },
-  { icon: TrendingUp, label: "AI-Powered Roadmap",    desc: "Personalized 60-day setup plan" },
-  { icon: Award,      label: "NABL Accreditation",    desc: "ISO 15189:2022 readiness tracking" },
-];
+import Link from "next/link";
+import { Package } from "lucide-react";
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [orgName, setOrgName] = useState("");
-  const [labType, setLabType] = useState("basic");
-  const [city, setCity] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          organizationName: orgName || undefined,
-          labType: labType || "basic",
-          city: city || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Registration failed.");
-        setLoading(false);
-        return;
-      }
-      const signInRes = await signIn("credentials", { email, password, redirect: false });
-      if (signInRes?.error) {
-        setError("Account created. Please log in.");
-        setLoading(false);
-        router.push("/login");
-        return;
-      }
-      router.push("/dashboard");
-      router.refresh();
-    } catch {
-      setError("Something went wrong.");
-      setLoading(false);
+      // Google handles both sign in and sign up automatically via OAuth
+      await signIn("google", { callbackUrl: "/dashboard/equipment" });
+    } catch (error) {
+      console.error("Sign up failed", error);
+      setIsLoading(false);
     }
-  }
+  };
+
+  const handleEmailSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // TODO: Create an API endpoint (e.g. /api/register) to save the user securely to your DB
+      // await fetch('/api/register', { method: 'POST', body: JSON.stringify({ name, email, password }) });
+
+      // Sign in the user automatically after successful creation
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        setError("Failed to create account. Please try again.");
+        setIsLoading(false);
+      } else {
+        router.push("/dashboard/equipment");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-[42%] relative overflow-hidden bg-[#0d1117] flex-col justify-between p-10">
-        <div className="relative z-10">
-          <div className="flex items-center gap-2.5 mb-14">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
-              <Microscope size={14} className="text-white" />
-            </div>
-            <span className="font-semibold text-white text-sm tracking-tight">SetupAI</span>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-center">
+        <div className="w-16 h-16 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto text-violet-600 mb-4 shadow-inner">
+          <Package size={32} />
+        </div>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create an Account</h1>
+          <p className="text-slate-500 mt-2 text-sm">Join SetupAI to manage your equipment seamlessly.</p>
+        </div>
+
+        <form onSubmit={handleEmailSignUp} className="space-y-4 mb-6 text-left">
+          <div>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full Name"
+              className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all text-sm text-slate-900"
+            />
+          </div>
+          <div>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all text-sm text-slate-900"
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a password"
+              className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all text-sm text-slate-900"
+            />
           </div>
 
-          <h2 className="text-2xl font-semibold text-white leading-tight">
-            Start your lab setup<br />
-            journey with<br />
-            <span className="text-blue-400">AI guidance</span>
-          </h2>
-          <p className="text-white/40 mt-4 text-sm leading-relaxed">
-            Join hundreds of diagnostic labs across India for seamless, compliant lab setup.
-          </p>
+          {error && <p className="text-sm text-rose-500 font-medium">{error}</p>}
 
-          <div className="mt-10 space-y-3">
-            {FEATURES.map((f) => {
-              const Icon = f.icon;
-              return (
-                <div key={f.label} className="flex items-center gap-3.5 p-3.5 bg-white/[0.04] rounded-xl border border-white/[0.07]">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
-                    <Icon size={15} className="text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white/80">{f.label}</p>
-                    <p className="text-xs text-white/30 mt-0.5">{f.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl bg-violet-600 border border-transparent text-white font-semibold hover:bg-violet-700 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="w-5 h-5 border-2 border-violet-400 border-t-white rounded-full animate-spin"></span>
+            ) : (
+              "Sign up with Email"
+            )}
+          </button>
+        </form>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-3 bg-white text-slate-500 font-medium">Or continue with</span>
           </div>
         </div>
 
-        <p className="relative z-10 text-xs text-white/20">
-          Trusted by diagnostic labs across India
+        <button
+          onClick={handleGoogleSignUp}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:text-slate-900 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? (
+            <span className="w-5 h-5 border-2 border-slate-300 border-t-violet-600 rounded-full animate-spin"></span>
+          ) : (
+            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+          )}
+          <span>Sign up with Google</span>
+        </button>
+
+        <p className="text-sm text-slate-500 mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-violet-600 font-semibold hover:underline">
+            Log in
+          </Link>
         </p>
-      </div>
-
-      {/* Right form panel */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#f7f8fa] overflow-y-auto">
-        <div className="w-full max-w-sm space-y-5">
-          {/* Logo (mobile) */}
-          <div className="text-center lg:hidden">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-600 shadow-md shadow-blue-200/60 mb-3">
-              <Microscope size={18} className="text-white" />
-            </div>
-          </div>
-
-          <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900">Create your account</h1>
-            <p className="mt-1 text-sm text-gray-500">Get started with SetupAI — free forever.</p>
-          </div>
-
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-card">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="rounded-lg bg-red-50 border border-red-100 px-3.5 py-2.5 text-sm text-red-700">
-                  {error}
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="name" className="block text-xs font-medium text-gray-600 mb-1.5">Full name</label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="input-base"
-                  placeholder="Dr. Priya Sharma"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-xs font-medium text-gray-600 mb-1.5">Email address</label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="input-base"
-                  placeholder="you@example.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Password <span className="text-gray-400 font-normal">(min 8 characters)</span>
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    className="input-base pr-10"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="orgName" className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Lab / Organization name <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <input
-                  id="orgName"
-                  type="text"
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                  placeholder="e.g. City Diagnostics"
-                  className="input-base"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="labType" className="block text-xs font-medium text-gray-600 mb-1.5">Lab type</label>
-                  <select
-                    id="labType"
-                    value={labType}
-                    onChange={(e) => setLabType(e.target.value)}
-                    className="input-base"
-                  >
-                    <option value="basic">Basic</option>
-                    <option value="medium">Medium</option>
-                    <option value="advanced">Advanced</option>
-                    <option value="clinic_lab">Clinic + Lab</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="city" className="block text-xs font-medium text-gray-600 mb-1.5">
-                    City <span className="text-gray-400 font-normal">(optional)</span>
-                  </label>
-                  <input
-                    id="city"
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Mumbai"
-                    className="input-base"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary justify-center py-2.5 mt-1"
-              >
-                {loading ? (
-                  <>
-                    <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Creating account&hellip;
-                  </>
-                ) : (
-                  "Create account — free"
-                )}
-              </button>
-            </form>
-          </div>
-
-          <p className="text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-              Sign in
-            </Link>
-          </p>
-        </div>
       </div>
     </div>
   );
