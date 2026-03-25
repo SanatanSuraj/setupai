@@ -75,7 +75,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Route | Description |
 |-------|-------------|
 | `/` | Landing page (redirects to `/dashboard` if logged in) |
-| `/pricing` | Pricing (Free / Pro / Enterprise) |
+| `/#pricing` | Pricing section on landing |
 | `/contact` | Contact / Book demo |
 | `/login` | Sign in |
 | `/register` | Create account |
@@ -110,7 +110,24 @@ Middleware redirects to `/dashboard?upgrade=pro` or `?upgrade=enterprise` when a
 - `npm run lint` – Run ESLint
 - `npm run seed` – Seed MongoDB (drops existing collections)
 
+## Documentation
+
+Full documentation package for managers and stakeholders is in [`docs/`](docs/):
+
+- **PRD** – Product Requirements Document
+- **SRS** – Software Requirements Specification
+- **Architecture** – HLD & LLD
+- **UI/UX** – User flows, wireframes
+- **API** – REST API reference
+- **Database** – Schema & relationships
+- **Roadmap** – Sprints & milestones
+- **Testing** – Test cases & QA approach
+- **Deployment** – CI/CD, DevOps guide
+- **User Manual** – End-user & admin guide
+- **Status Report** – Completed, pending, risks
+
+See [docs/README.md](docs/README.md) for the full index.
+
 ## License
 
 Proprietary.
-# setupai
