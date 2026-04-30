@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       labType,
       city,
       state: state || organization.state,
-      district: district || organization.district,
+      district,
       budget: budget || 1000000
     });
 

@@ -23,6 +23,11 @@ export interface IOrganization {
   labType: LabType;
   city: string;
   state?: string;
+  district?: string;
+  area?: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  testMenu?: string[];
   budget?: number;
   subscriptionTier: SubscriptionTier;
   createdAt?: Date;

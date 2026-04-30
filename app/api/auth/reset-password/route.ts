@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      const msg = parsed.error.errors[0]?.message ?? "Invalid request";
+      const msg = parsed.error.issues[0]?.message ?? "Invalid request";
       return NextResponse.json(
         { error: msg, requestId },
         { status: 400 }
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     const tokens = await PasswordResetToken.find({ expiresAt: { $gt: new Date() } }).lean();
 
-    let matchedToken: { _id: unknown; userId: unknown } | null = null;
+    let matchedToken: (typeof tokens)[number] | null = null;
     for (const t of tokens) {
       const ok = await bcrypt.compare(token, t.tokenHash);
       if (ok) {

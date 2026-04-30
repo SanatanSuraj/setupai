@@ -5,6 +5,7 @@ import { Card } from "@/components/dashboard/Card";
 import { SetupProgress } from "@/components/dashboard/SetupProgress";
 import { ComplianceHealthCard } from "@/components/dashboard/ComplianceHealthCard";
 import { NablStatCard, NablSnapshotCard } from "@/components/dashboard/NablDashboardCards";
+import { GoLiveStatusCard } from "@/components/dashboard/GoLiveStatusCard";
 import {
   Map,
   ShieldCheck,
@@ -12,7 +13,6 @@ import {
   Wrench,
   BookOpen,
   Users,
-  Award,
   Activity,
   ArrowRight,
   FileText,
@@ -20,6 +20,7 @@ import {
   TrendingUp,
   CheckCircle2,
   Sparkles,
+  Rocket,
 } from "lucide-react";
 
 const modules = [
@@ -59,11 +60,11 @@ const modules = [
     accent: "emerald",
   },
   {
-    href: "/dashboard/nabl",
-    label: "NABL Accreditation",
-    description: "ISO 15189 documentation and audit readiness.",
-    icon: Award,
-    accent: "amber",
+    href: "/dashboard/go-live",
+    label: "Go Live Checklist",
+    description: "Every gate that must clear before opening day.",
+    icon: Rocket,
+    accent: "orange",
   },
   {
     href: "/dashboard/compliance",
@@ -198,6 +199,9 @@ export default async function DashboardPage() {
           },
         ].map(renderStat)}
       </div>
+
+      {/* ── Go Live Checklist ──────────────────────────────────────────── */}
+      <GoLiveStatusCard />
 
       {/* ── Main 3-column grid ─────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

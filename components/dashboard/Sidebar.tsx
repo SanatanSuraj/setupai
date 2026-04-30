@@ -17,6 +17,7 @@ import {
   LogOut,
   Microscope,
   ChevronRight,
+  Rocket,
 } from "lucide-react";
 
 const navGroups = [
@@ -34,6 +35,12 @@ const navGroups = [
       { href: "/dashboard/licensing",   label: "Licensing",         icon: FileCheck },
       { href: "/dashboard/compliance",  label: "Compliance",        icon: ShieldCheck },
       { href: "/dashboard/nabl",        label: "NABL",              icon: Award },
+    ],
+  },
+  {
+    label: "Launch",
+    items: [
+      { href: "/dashboard/go-live",     label: "Go Live Checklist", icon: Rocket },
     ],
   },
   {

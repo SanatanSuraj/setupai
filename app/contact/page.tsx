@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { Navbar } from "@/components/landing/Navbar";
-import { Footer } from "@/components/landing/Footer";
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 px-4 py-16 md:py-24">
         <div className="mx-auto max-w-xl text-center">
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">Contact us</h1>
@@ -68,7 +65,6 @@ export default function ContactPage() {
           </p>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
