@@ -2,7 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
