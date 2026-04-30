@@ -3,7 +3,7 @@ import { GoLiveGate } from '@/models/GoLiveGate';
 import { Organization } from '@/models/Organization';
 import { StateRegulatoryProfile } from '@/models/StateRegulatoryProfile';
 import { aiOrchestrator } from '../ai-orchestrator';
-import connectDB from '../mongodb';
+import { connectDB } from '../mongodb';
 
 export interface ComplianceAlert {
   organizationId: string;

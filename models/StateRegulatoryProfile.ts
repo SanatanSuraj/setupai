@@ -140,11 +140,10 @@ export interface StateRegulatoryProfileDocument extends IStateRegulatoryProfile,
 }
 
 const StateRegulatoryProfileSchema = new Schema<StateRegulatoryProfileDocument>({
-  state: { 
-    type: String, 
-    required: true, 
+  state: {
+    type: String,
+    required: true,
     unique: true,
-    index: true
   },
   stateCode: {
     type: String,
@@ -290,8 +289,7 @@ const StateRegulatoryProfileSchema = new Schema<StateRegulatoryProfileDocument>(
   timestamps: true
 });
 
-// Indexes
-StateRegulatoryProfileSchema.index({ state: 1 });
+// Indexes (state is already indexed via `unique: true` on the field)
 StateRegulatoryProfileSchema.index({ stateCode: 1 });
 StateRegulatoryProfileSchema.index({ 'districtVariations.district': 1 });
 

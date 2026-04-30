@@ -77,12 +77,11 @@ export interface TenantBrandingDocument extends ITenantBranding, Document {
 }
 
 const TenantBrandingSchema = new Schema<TenantBrandingDocument>({
-  organizationId: { 
-    type: Schema.Types.ObjectId, 
+  organizationId: {
+    type: Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true, 
+    required: true,
     unique: true,
-    index: true 
   },
   brandName: { 
     type: String, 
@@ -185,8 +184,7 @@ const TenantBrandingSchema = new Schema<TenantBrandingDocument>({
   timestamps: true
 });
 
-// Indexes for performance
-TenantBrandingSchema.index({ organizationId: 1 });
+// Indexes (organizationId is already indexed via `unique: true` on the field)
 TenantBrandingSchema.index({ customDomain: 1 });
 TenantBrandingSchema.index({ 'subscription.plan': 1 });
 

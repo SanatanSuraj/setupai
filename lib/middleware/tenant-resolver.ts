@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { TenantBranding } from '@/models/TenantBranding';
 import { Organization } from '@/models/Organization';
-import connectDB from '../mongodb';
+import { connectDB } from '../mongodb';
 
 export interface TenantContext {
   organizationId: string;

@@ -5,6 +5,8 @@ import { SampleOrder } from "@/models/SampleOrder";
 import { Staff } from "@/models/Staff";
 import { connectDB } from "@/lib/mongodb";
 
+export const dynamic = "force-dynamic";
+
 // Average test price in INR for a small diagnostic lab (India).
 // Update this constant when real pricing data is available.
 const AVG_TEST_PRICE_INR = 800;

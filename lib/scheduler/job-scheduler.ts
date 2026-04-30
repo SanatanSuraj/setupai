@@ -2,7 +2,7 @@ import { complianceMonitor } from '../jobs/compliance-monitor';
 import { aiOrchestrator } from '../ai-orchestrator';
 import { Organization } from '@/models/Organization';
 import { TenantBranding } from '@/models/TenantBranding';
-import connectDB from '../mongodb';
+import { connectDB } from '../mongodb';
 
 export interface JobConfig {
   name: string;

@@ -8,7 +8,6 @@ const RoadmapSchema = new Schema<IRoadmap>(
       type: Schema.Types.ObjectId,
       ref: "Organization",
       required: true,
-      index: true,
     },
     tasks: [{ type: Schema.Types.Mixed }],
     phases: [{ type: Schema.Types.Mixed }],
